@@ -61,6 +61,7 @@ $ (function(){
           oldInitDone = 1; //setting value to implies that old-chats first event is done.
           if(data.result.length != 0){
             $('#noChat').hide(); //hiding no more chats message.
+            $('#messages').empty();
             for (var i = 0;i < data.result.length;i++) {
               //styling of chat message.
             
@@ -193,8 +194,8 @@ $ (function(){
 
     $.ajax({
       type: "POST",
-      url: "http://localhost:5001/upload/file",
-      //url: "https://192.168.1.110:5000/upload/file",
+      //url: "http://localhost:5002/upload/file",
+      url: "http://10.1.30.146:5002/upload/file",
       //url: "https://umairyasin1-dinochat.glitch.me/upload/file",
       // url: "https://dinochat.glitch.me/upload/file",
       //url: "https://dinochat.netlify.app/upload/file",
@@ -214,7 +215,7 @@ $ (function(){
         $("#photos-input").val("");
       },
       error: function (e) {
-          console.log("some error", e);
+          console.log("some error", e.msg);
       }
   });
 
@@ -254,6 +255,7 @@ $ (function(){
     // var txt2 = $('<span></span>').text(chatDate);
     // var txt3 = $('<p></p>').append(txt1,txt2);
     // var txt6 = $("<img>").attr("src" , "/pics/userimg.jpg");
+    //$('#messages').empty();
     var visitorImg = $("<img>").attr("src" , "/pics/visitor.jpeg");
     var agentImg = $("<img>").attr("src" , "/pics/agent.png");
     var txt4 = $('<p></p>').text(data.msg);

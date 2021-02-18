@@ -37,7 +37,8 @@ module.exports.sockets = function(http) {
 
   var allClients = [];
 
-
+  var isReadVisitorId = 0;
+  var isReadMsgId = 0;
   // socket io direct on
   // ioDirect.on("connection", function(socket) {
   //   console.log("socketio connected.");
@@ -53,11 +54,18 @@ module.exports.sockets = function(http) {
   ioChat.on("connection", function(socket) {
     console.log("socketio chat connected.");
     allClients.push(socket);
+
+
+
+    socket.emit('testSumair');
+    // socket.on('testSumair',function(){
+    //           console.log('test');
+    //           });
     
-    socket.emit('sumair');
+    //socket.emit('sumair');
     //function to get user name
-    socket.on("set-user-data", function() {
-      const username = 'l7i1-MlFL';
+    socket.on("set-user-data", function(username) {
+      // const username = 'rBXxhnFCR';
       console.log(username + "  logged In");
 
       //storing variable.
@@ -106,278 +114,310 @@ module.exports.sockets = function(http) {
 
   
 
-  socket.on("get_visitor_id", function(visitId, callback) {
-
-    visitorModel.findOne(
-           { $and: [{ visitor_id: visitId }] },
-           function(err, result) {
-            //console.log(result.visitor_region_privateIp.length || result.visitor_region_privateIp);
-            
-            //var countryVal2 = "-";
-            // var browserVal2 = "-";
-            // var osVal2 = "-";
-            // var platformVal2 = "-";
-            // var ipAddressVal2 = "-";
-            // var totalHoursVal2 = "-";
-            // var totalTimeShortVal2 = "-";
-            // var totalTimeExpVal2 = "-";
-            // var createdDateVal2 = "-";
-
-            var totalHoursVal2 = ( function() {
-              date2 = result.createdOn;
-              var then = moment(date2, "YYYY-MM-DD'T'HH:mm:ss:SSSZ");
-              var now = moment(); 
-              var ms = moment(now,"DD/MM/YYYY HH:mm:ss").diff(moment(then,"DD/MM/YYYY HH:mm:ss"));
-              var d = moment.duration(ms);
-              var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm:ss");
-              return s;
-            })();
-
-            var totalTimeShortVal2 = ( function() {
-              date2 = result.createdOn;
-              var dateVal = moment(date2, "YYYY-MM-DD'T'HH:mm:ss:SSSZ").fromNow();
-              return dateVal;
-            })();
-
-            var totalTimeExpVal2 = ( function() {
-              date2 = result.createdOn;
-
-              var then = moment(date2, "YYYY-MM-DD'T'HH:mm:ss:SSSZ");
-              var now = moment(); 
-              var delta = Math.abs(now - then) / 1000;
-              var days = Math.floor(delta / 86400);
-              delta -= days * 86400;
-              var hours = Math.floor(delta / 3600) % 24;
-              delta -= hours * 3600;
-              var minutes = Math.floor(delta / 60) % 60;
-              delta -= minutes * 60;
-              var seconds = delta % 60;
-              var retVal;
-              if(days != 0){
-                retVal = days + " day, " + hours + " hour, " + minutes + " min, " + seconds.toFixed(0) + " sec ago";
-              }
-              else if (hours != 0){
-                retVal = hours + " hour, " + minutes + " min, " + seconds.toFixed(0) + " sec ago";
-              }
-              else if (minutes != 0){
-                retVal = minutes + " min, " + seconds.toFixed(0) + " sec ago";
-              }
-              else{
-                retVal = seconds.toFixed(0) + " sec ago";
-              }
-              return retVal;
-
-            })();
-
-            var createdDateVal2 = ( function() {
-              date2 = result.createdOn;
-              var comeDate = moment(date2).format('MMMM Do YYYY, h:mm a');
-              return comeDate;
-            })();
-
-            var countryVal2 = ( function() {
-              if(result.visitor_region_privateIp.length != 0)
-              {
-                return result.visitor_region_privateIp[0].country;
-              }
-              else if(result.visitor_region_publicIp.length != 0)
-              {
-                return result.visitor_region_publicIp[0].country;
-              }
-              else{
-                return "-";
-              }
-            })();
-
-            var browserVal2 = ( function() {
-              if(result.visitor_browser_and_os.length != 0)
-              {
-                return result.visitor_browser_and_os[0].browser;
-              }
-              else
-              {
-                return "-";
-              }
-            })();
-
-            var osVal2 = ( function() {
-              if(result.visitor_browser_and_os.length != 0)
-              {
-                return result.visitor_browser_and_os[0].os;
-              }
-              else
-              {
-                return "-";
-              }
-            })();
-
-            var platformVal2 = ( function() {
-              if(result.visitor_browser_and_os.length != 0)
-              {
-                return result.visitor_browser_and_os[0].platform;
-              }
-              else
-              {
-                return "-";
-              }
-            })();
-
-            var ipAddressVal2 = ( function() {
-              if(result.visitor_privateIp != null || result.visitor_privateIp != "")
-              {
-                return result.visitor_privateIp;
-              }
-              else if(result.visitor_publicIp != null || result.visitor_publicIp != "")
-              {
-                return result.visitor_publicIp;
-              }
-              else{
-                return "-";
-              }
-            })();
-
-           // console.log(result.visitor_region_privateIp);
-            
-             var countryVal =  countryVal2;
-             var browserVal = browserVal2; //result.visitor_browser_and_os[0].browser;
-             var osVal = osVal2; //result.visitor_browser_and_os[0].os;
-             var platformVal = platformVal2; //result.visitor_browser_and_os[0].platform;
-             var ipAddressVal = ipAddressVal2;
-             var totalHoursVal = totalHoursVal2;
-             var totalTimeShortVal = totalTimeShortVal2;
-             var totalTimeExpVal = totalTimeExpVal2;
-             var createdDateVal = createdDateVal2;
-
-            if(err)
-            {
-              visit_name =  "";
-              agent_name = "";
-
-              response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                country: countryVal,
-                browser: browserVal,
-                os: osVal,
-                platform: platformVal,
-                ipaddress : ipAddressVal,
-                totalhournumber : totalHoursVal,
-                totaltimeshort : totalTimeShortVal,
-                totaltimelong : totalTimeExpVal,
-                createdate : createdDateVal
-              }
-
-              callback(response);
-            }
-
-            if(result!=null)
-            {
-             var  visit_name = result.visitor_name;
-
-             if(visit_name == "")
-             {
-              visit_name =  "";
-              agent_name = "";
-
-              response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                country: countryVal,
-                browser: browserVal,
-                os: osVal,
-                platform: platformVal,
-                ipaddress : ipAddressVal,
-                totalhournumber : totalHoursVal,
-                totaltimeshort : totalTimeShortVal,
-                totaltimelong : totalTimeExpVal,
-                createdate : createdDateVal
-              }
-
-              callback(response); 
-             }
-             else 
-             {
-              visit_name =  visit_name;
-
-              roomModel.findOne(
-                { $and: [{ name1 : visitId}] },
-                function(err, res){
-
-                  if(err)
-                  {
-                    visit_name =  visit_name;
-                    agent_name = "";
-                    response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal
-                    }
-
-                      callback(response);
-                  }
-
-                  if(res!=null)
-                  {
-             
-                  if(res.name2 == "")
-                  {
-                    visit_name =  visit_name;
-                    agent_name = "";
-                    response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal
-                    }
-
-                      callback(response);
-
-                  }
-                  else
-                  {
-                    console.log('4 else');
-
-                    visit_name =  visit_name;
-                  agentModel.findOne(
-                    { $and: [{ agent_id : res.name2}] },
-                    function(err, resp){
-  
-                     response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal
-                    }
-
-                      callback(response);
-  
-                    }
-                  )
-
-                  }
-                }
-                }
-              )
-
-              }
-            }
+    socket.on("get_visitor_id", function(obj, callback) {
+      var visitId = obj.visitorId;
+      var agentId = obj.agentId;
+      // console.log('visitId --1',visitId);
+      // console.log('agentId --1',agentId);
+      visitorModel.findOne(
+             { $and: [{ visitor_id: visitId }] },
+             function(err, result) {
               
-          
-           }
-         );
-  });
+              //#region getting values
+
+              //console.log(result.visitor_region_privateIp.length || result.visitor_region_privateIp);
+              
+              //var countryVal2 = "-";
+              // var browserVal2 = "-";
+              // var osVal2 = "-";
+              // var platformVal2 = "-";
+              // var ipAddressVal2 = "-";
+              // var totalHoursVal2 = "-";
+              // var totalTimeShortVal2 = "-";
+              // var totalTimeExpVal2 = "-";
+              // var createdDateVal2 = "-";
+  
+              var totalHoursVal2 = ( function() {
+                date2 = result.createdOn;
+                var then = moment(date2, "YYYY-MM-DD'T'HH:mm:ss:SSSZ");
+                var now = moment(); 
+                var ms = moment(now,"DD/MM/YYYY HH:mm:ss").diff(moment(then,"DD/MM/YYYY HH:mm:ss"));
+                var d = moment.duration(ms);
+                var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm:ss");
+                return s;
+              })();
+  
+              var totalTimeShortVal2 = ( function() {
+                date2 = result.createdOn;
+                var dateVal = moment(date2, "YYYY-MM-DD'T'HH:mm:ss:SSSZ").fromNow();
+                return dateVal;
+              })();
+  
+              var totalTimeExpVal2 = ( function() {
+                date2 = result.createdOn;
+  
+                var then = moment(date2, "YYYY-MM-DD'T'HH:mm:ss:SSSZ");
+                var now = moment(); 
+                var delta = Math.abs(now - then) / 1000;
+                var days = Math.floor(delta / 86400);
+                delta -= days * 86400;
+                var hours = Math.floor(delta / 3600) % 24;
+                delta -= hours * 3600;
+                var minutes = Math.floor(delta / 60) % 60;
+                delta -= minutes * 60;
+                var seconds = delta % 60;
+                var retVal;
+                if(days != 0){
+                  retVal = days + " day, " + hours + " hour, " + minutes + " min, " + seconds.toFixed(0) + " sec ago";
+                }
+                else if (hours != 0){
+                  retVal = hours + " hour, " + minutes + " min, " + seconds.toFixed(0) + " sec ago";
+                }
+                else if (minutes != 0){
+                  retVal = minutes + " min, " + seconds.toFixed(0) + " sec ago";
+                }
+                else{
+                  retVal = seconds.toFixed(0) + " sec ago";
+                }
+                return retVal;
+  
+              })();
+  
+              var createdDateVal2 = ( function() {
+                date2 = result.createdOn;
+                var comeDate = moment(date2).format('MMMM Do YYYY, h:mm a');
+                return comeDate;
+              })();
+  
+              var countryVal2 = ( function() {
+                if(result.visitor_region_privateIp.length != 0)
+                {
+                  return result.visitor_region_privateIp[0].country;
+                }
+                else if(result.visitor_region_publicIp.length != 0)
+                {
+                  return result.visitor_region_publicIp[0].country;
+                }
+                else{
+                  return "-";
+                }
+              })();
+  
+              var browserVal2 = ( function() {
+                if(result.visitor_browser_and_os.length != 0)
+                {
+                  return result.visitor_browser_and_os[0].browser;
+                }
+                else
+                {
+                  return "-";
+                }
+              })();
+  
+              var osVal2 = ( function() {
+                if(result.visitor_browser_and_os.length != 0)
+                {
+                  return result.visitor_browser_and_os[0].os;
+                }
+                else
+                {
+                  return "-";
+                }
+              })();
+  
+              var platformVal2 = ( function() {
+                if(result.visitor_browser_and_os.length != 0)
+                {
+                  return result.visitor_browser_and_os[0].platform;
+                }
+                else
+                {
+                  return "-";
+                }
+              })();
+  
+              var ipAddressVal2 = ( function() {
+                if(result.visitor_privateIp != null || result.visitor_privateIp != "")
+                {
+                  return result.visitor_privateIp;
+                }
+                else if(result.visitor_publicIp != null || result.visitor_publicIp != "")
+                {
+                  return result.visitor_publicIp;
+                }
+                else{
+                  return "-";
+                }
+              })();
+  
+             // console.log(result.visitor_region_privateIp);
+              
+               var countryVal =  countryVal2;
+               var browserVal = browserVal2; //result.visitor_browser_and_os[0].browser;
+               var osVal = osVal2; //result.visitor_browser_and_os[0].os;
+               var platformVal = platformVal2; //result.visitor_browser_and_os[0].platform;
+               var ipAddressVal = ipAddressVal2;
+               var totalHoursVal = totalHoursVal2;
+               var totalTimeShortVal = totalTimeShortVal2;
+               var totalTimeExpVal = totalTimeExpVal2;
+               var createdDateVal = createdDateVal2;
+  
+              //#endregion
+              
+  
+              if(err)
+              {
+                visit_name =  "";
+                agent_name = "";
+  
+                response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                  country: countryVal,
+                  browser: browserVal,
+                  os: osVal,
+                  platform: platformVal,
+                  ipaddress : ipAddressVal,
+                  totalhournumber : totalHoursVal,
+                  totaltimeshort : totalTimeShortVal,
+                  totaltimelong : totalTimeExpVal,
+                  createdate : createdDateVal,
+                  createdOn : result.createdOn,
+                  payment_link : result.payment_link
+                }
+  
+                callback(response);
+              }
+  
+              if(result!=null)
+              {
+               var  visit_name = result.visitor_name;
+  
+               if(visit_name == "")
+               {
+                visit_name =  "";
+                agent_name = "";
+  
+                response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                  country: countryVal,
+                  browser: browserVal,
+                  os: osVal,
+                  platform: platformVal,
+                  ipaddress : ipAddressVal,
+                  totalhournumber : totalHoursVal,
+                  totaltimeshort : totalTimeShortVal,
+                  totaltimelong : totalTimeExpVal,
+                  createdate : createdDateVal,
+                  createdOn : result.createdOn,
+                  payment_link : result.payment_link
+                }
+  
+                callback(response); 
+               }
+               else 
+               {
+                visit_name =  visit_name;
+  
+                roomModel.findOne(
+                  { 
+                    //$and: [{ name1 : visitId, name2 : agentId } || { name1 : visitId, name2 : ""}]
+                    $and: [
+                            {
+                              $or: 
+                              [
+                                { name1 : visitId, name2 : agentId }, 
+                                { name1 : visitId, name2 : '' }
+                              ]
+                            }
+                          ] 
+                    //$and: [{ name1 : visitId }] 
+                  },
+                  function(err, res){
+  
+                    if(err)
+                    {
+                      visit_name =  visit_name;
+                      agent_name = "";
+                      response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                        country: countryVal,
+                        browser: browserVal,
+                        os: osVal,
+                        platform: platformVal,
+                        ipaddress : ipAddressVal,
+                        totalhournumber : totalHoursVal,
+                        totaltimeshort : totalTimeShortVal,
+                        totaltimelong : totalTimeExpVal,
+                        createdate : createdDateVal,
+                        createdOn : result.createdOn,
+                        payment_link : result.payment_link
+                      }
+  
+                        callback(response);
+                    }
+  
+                    if(res!=null)
+                    {
+               
+                    if(res.name2 == "")
+                    {
+                      console.log('2 else', res.name2);
+                      visit_name =  visit_name;
+                      agent_name = "";
+                      response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                        country: countryVal,
+                        browser: browserVal,
+                        os: osVal,
+                        platform: platformVal,
+                        ipaddress : ipAddressVal,
+                        totalhournumber : totalHoursVal,
+                        totaltimeshort : totalTimeShortVal,
+                        totaltimelong : totalTimeExpVal,
+                        createdate : createdDateVal,
+                        createdOn : result.createdOn,
+                        payment_link : result.payment_link
+                      }
+  
+                        callback(response);
+  
+                    }
+                    else
+                    {
+                      //console.log('4 else', res.name2);
+                      // console.log('result -- 11', res);
+  
+                      visit_name =  visit_name;
+                    agentModel.findOne(
+                      { $and: [{ agent_id : res.name2}] },
+                      function(err, resp){
+                        response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,
+                        country: countryVal,
+                        browser: browserVal,
+                        os: osVal,
+                        platform: platformVal,
+                        ipaddress : ipAddressVal,
+                        totalhournumber : totalHoursVal,
+                        totaltimeshort : totalTimeShortVal,
+                        totaltimelong : totalTimeExpVal,
+                        createdate : createdDateVal,
+                        createdOn : result.createdOn,
+                        payment_link : result.payment_link
+                      }
+  
+                        callback(response);
+    
+                      }
+                    )
+  
+                    }
+                  }
+                  }
+                )
+  
+                }
+              }
+                
+            
+             }
+           );
+    });
 
 
   socket.on("get_agent_id", function(agentId, callback) {
@@ -432,7 +472,8 @@ module.exports.sockets = function(http) {
         { $and: [{ msgId : msgId}] },
         function(err, dat){
 
-        //  console.log(dat.msgId + ' - ' + repId);
+          //console.log('dat--1',dat);
+          // console.log(dat.msgId + ' - ' + repId);
 
           var msg = dat.msg;
           var msgId = dat.msgId;
@@ -440,6 +481,11 @@ module.exports.sockets = function(http) {
           var msgTo = dat.msgTo;
           var file = dat.file;
           var createdOn = dat.createdOn;
+          var room = dat.room;
+          // var isReadVal = dat.isRead;
+          //var isReadVal = true;
+          //chatModel.updateMany({"msgId": msgId}, {"$set":{"isRead": true}});
+          chatModel.update({"msgId": msgId, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
 
           if(dat.repMsgId == ""){
 
@@ -454,13 +500,16 @@ module.exports.sockets = function(http) {
               repmsgTo : msgTo,
               repmsg : msg, 
               repfile : file, 
-              repcreatedOn : createdOn
+              repcreatedOn : createdOn,
+              reproomId : room,
+              repIsRead : dat.isRead
             }
 
             callback(response);
 
           }else{
-
+            
+            //console.log('10 else');
           chatModel.findOne(
             {$and: [{ msgId : dat.repMsgId}]},function(err, res){
 
@@ -475,15 +524,15 @@ module.exports.sockets = function(http) {
                 repmsgTo : res.msgTo,
                 repmsg : res.msg, 
                 repfile : res.file, 
-                repcreatedOn : res.createdOn
+                repcreatedOn : res.createdOn,
+                reproomId : room,
+                repIsRead : res.isRead
               }
-
               callback(response);
    
 
             }
           )
-
           }
 
         }
@@ -511,6 +560,7 @@ module.exports.sockets = function(http) {
 
     //setting room.
     socket.on("set-room", function(room) {
+      //console.log('sumair');
       //leaving room.
       socket.leave(socket.room);
       //getting room data.
@@ -524,12 +574,14 @@ module.exports.sockets = function(http) {
     }); //end of set-room event.
 
     socket.on("update-room", function(room) {
-      
-      const filter = { name1: room.visitor_id };
+      // console.log('muzaffar room back',room);
+      // console.log('muzaffar room agentId',room.agent_id);
+      // console.log('muzaffar room visitorId',room.visitor_id.id);
+      const filter = { name1: room.visitor_id.id };
       const update = { name2: room.agent_id };
 
-      roomModel.findOne({ name1: room.visitor_id }, function(err,obj) { 
-
+      roomModel.findOne({ name1: room.visitor_id.id }, function(err,obj) { 
+        //console.log('room->',room.visitor_id.id);
         if(err)
         {
           socket.room =  obj._id;
@@ -538,12 +590,15 @@ module.exports.sockets = function(http) {
         }
         if(obj != null)
         {
+          //console.log('ji bhai');
           if(obj.name2 == "")
           {
+            //console.log('ji bhai 2');
             roomModel.findOneAndUpdate(
               filter , update , function(err, result) {
               socket.room = result._id;
               chatModel.updateMany({ room : socket.room } , {$set: { msgTo: room.agent_id }} , function(err, result) { }  )
+              chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
                 socket.room = result._id;
                 socket.join(socket.room);
                 ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
@@ -551,30 +606,47 @@ module.exports.sockets = function(http) {
           }
           else
           {
+              console.log('ji bhai 3');
               socket.room =  obj._id;
               socket.join(socket.room);
+              console.log('rehan bhai', userSocket[socket.username]);
+              chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
               ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
+              //ioChat.emit("update-room", socket.room);
+              // ioChat.emit("test-sumair", socket.room);
+              // console.log('kamran ', userSocket[socket.username]);
           }
         } 
       });
     }); //end of set-room event.
 
+
     //emits event to read old-chats-init from database.
     socket.on("old-chats-init", function(data) {
+      //console.log('nasir bhai', data);
       eventEmitter.emit("read-chat", data);
     });
 
     //emits event to read old chats from database.
     socket.on("old-chats", function(data) {
+      //console.log('danish bari backend', data);
       eventEmitter.emit("read-chat", data);
     });
 
     //sending old chats to client.
     oldChats = function(result, username, room) {
+      // console.log('sajid bhai ',result);
+      // console.log('sajid bhai room ',room);
+      // console.log('sajid bhai room 2',userSocket[username]);
+      // console.log('sajid bhai room 3',username);
       ioChat.to(userSocket[username]).emit("old-chats", {
         result: result,
         room: room
       });
+      // ioChat.emit("old-chats", {
+      //   result: result,
+      //   room: room
+      // });
     };
 
     //showing msg on typing.
@@ -610,10 +682,18 @@ module.exports.sockets = function(http) {
     //   },3500);
     // }); //end of typing event.
 
-
+    socket.on("msg-is-read", function(data) {
+      console.log('nasir bhai', data);
+      isReadVisitorId = data.visitor_id;
+      isReadMsgId = data.msgId;
+      // chatModel.update({"msgFrom": data.visitor_id}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+      //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
+    });
 
     //for showing chats.
     socket.on("chat-msg", function(data) {
+      //console.log('sokcet - room : ',socket.room);
+      console.log('chat-msg saboor: ',data);
       const id = shortid.generate();
       //emits event to save chat to database.
       eventEmitter.emit("save-chat", {
@@ -629,7 +709,6 @@ module.exports.sockets = function(http) {
       });
 
       //emits event to send chat msg to all clients.
-
        if(data.repMsgId != ""){
         chatModel.findOne(
           { $and: [{ msgId : data.repMsgId}] },
@@ -646,18 +725,22 @@ module.exports.sockets = function(http) {
               repMsg : res.msg,
               repfile: res.file,
               repDate: res.createdOn,
+              isRead : false
             });
             
           }
         )
        }else{
+         console.log(' socket.room 2',socket.room);
+         //console.log(' socket.room 3',data.date);
          ioChat.to(socket.room).emit("chat-msg", {
            msgFrom: data.msgFrom,
            file: data.file,
            msg: data.msg,
            id: id,
            date: data.date,
-           repMsg : ""
+           repMsg : "",
+           isRead : false
          });
        }
        
@@ -698,7 +781,7 @@ module.exports.sockets = function(http) {
   //saving chats to database.
   eventEmitter.on("save-chat", function(data) {
     // var today = Date.now();
-    
+    console.log(data);
     if(data.type=="agent"){
      var newChat = new chatModel({
        msgFrom: data.msgFrom,
@@ -771,6 +854,15 @@ module.exports.sockets = function(http) {
               } else if (result == undefined || result == null || result == "") {
                 console.log("Chat Is Not Saved.");
               } else {
+                // chatModel.findOne({ msgId: isReadMsgId }, function(err,obj) {
+                //   console.log('obj result ', obj);
+                // });
+                console.log('is read vis id', isReadVisitorId);
+                if(isReadVisitorId != 0)
+                {
+                    console.log('isReadMsgId', isReadMsgId);
+                    chatModel.update({"msgId": isReadMsgId}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+                }
                 console.log("Chat Saved 3.");
               }
            
@@ -794,11 +886,13 @@ module.exports.sockets = function(http) {
 
   //reading chat from database.
   eventEmitter.on("read-chat", function(data) {
+    //console.log('adil bhai');
     chatModel
       .find({})
       .where("room")
       .equals(data.room)
-      .sort("-createdOn")
+      //.sort("-createdOn")
+      //.sort({createdOn: 1})
       .skip(data.msgCount)
       .lean()
      // .limit(5)
@@ -807,10 +901,11 @@ module.exports.sockets = function(http) {
           console.log("Error : " + err);
         } else {
           //calling function which emits event to client to show chats.
-          //console.log(data);
+          //console.log('saboor', result);
           oldChats(result, data.username, data.room);
         }
       });
+      //console.log('shoiab', data);
   }); //end of reading chat from database.
 
 

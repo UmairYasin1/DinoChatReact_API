@@ -19,7 +19,7 @@ const http = require("http").Server(app);
 var useragent = require('express-useragent');
 
 //port setup
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5002;
 
 //socket.io
 
@@ -150,6 +150,7 @@ app.use(function(req, res, next) {
     next();
   }
 }); //end of set Logged In User.
+
 
 http.listen(port, function() {
   console.log("Chat App started at port :" + port);

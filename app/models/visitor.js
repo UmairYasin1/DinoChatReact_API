@@ -5,6 +5,8 @@ const visitorSchema = new Schema({
   visitor_name: { type: String, default: "", required: true },
   visitor_email: { type: String, default: "", required: true },
   phone_number: { type: String, default: "", required: true },
+  payment_link: { type: String, default: "" },
+  brand: { type: String, default: "" },
   company_name: { type: String, default: "" },
   number_of_employees: { type: String, default: "" },
   visitor_publicIp: { type: String, default: "" },

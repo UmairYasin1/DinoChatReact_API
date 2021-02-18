@@ -6,6 +6,7 @@ const chatSchema = new Schema({
   msgFrom: { type: String, default: "", required: true },
   msgTo: { type: String, default: "" },
   msg: { type: String, default: "" },
+  isRead: { type: Boolean, default: false },
   file: { type: String, default: "",},
   room: { type: String, default: "", required: true },
   createdOn: { type: Date, default: Date.now }
