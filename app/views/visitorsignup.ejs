@@ -51,5 +51,22 @@
   <% include ./parts/footer.ejs %>
 
   <script src="/js/visitorscript.js"></script>
+  <script>
+    $(document).ready(function () {
+
+        var url = (window.location != window.parent.location)
+        ? document.referrer
+        : document.location.href;
+        // console.log('url',url);
+        // console.log('window.location',window.location);
+        // console.log('window.parent.location',window.parent.location);
+        // console.log('document.referrer',document.referrer);
+        // console.log('document.location.href',document.location.href);
+
+        console.log('window.parent.location.href',window.parent.location.href);
+   });
+
+  </script>
+
 </body>
 </html>

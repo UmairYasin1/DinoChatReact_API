@@ -50,8 +50,8 @@ module.exports.controller = function(app) {
     
     const epass = encrypt.encryptPassword(req.body.password);
     const token = Buffer.from(`${req.body.email}:${req.body.password}`, 'utf8').toString('base64');
-    console.log(req.body.email);
-    console.log(req.body.password);
+    
+    
     agentModel.findOne(
       { $and: [{ agent_email: req.body.email }, { agent_password: epass }] },
       function(err, result) {
@@ -61,8 +61,9 @@ module.exports.controller = function(app) {
             message: "Some Error Occured During Login"
           });
 
-        } else if (result == null || result == undefined || result == "") {
-
+        } 
+        else if (result == null || result == undefined || result == "") 
+        {
           res.status(404).json({
             success: false,
             message: "User Not Found. Please Check Your Username and Password."
@@ -163,6 +164,65 @@ module.exports.controller = function(app) {
     });
   });
 
+  router.post("/api/v1/changepassword", function( req, res) {
+    
+    const epass = encrypt.encryptPassword(req.body.password);
+    const token = Buffer.from(`${req.body.agent_email}:${req.body.password}`, 'utf8').toString('base64');
+
+    agentModel.findOne(
+      { $and: [{ agent_email: req.body.agent_email }] },
+      function(err, result) {
+        if (err) {
+          res.status(500).json({
+            success: false,
+            message: "Some Error Occured On Changing Password"
+          });
+
+        } else if (result == null || result == undefined || result == "") {
+
+          res.status(404).json({
+            success: false,
+            message: "User Not Found. Please Check Your Email."
+          });
+
+        } else {
+
+          agentModel.updateOne({agent_email: req.body.agent_email}, {"$set":{agent_password: epass}}, (err, updateRes) => {
+            if (err) {
+              res.status(500).json({
+                success: false,
+                message: "Some Error Occured On Changing Password. Response Failure."
+              });
+    
+            } else if (updateRes == null || updateRes == undefined || updateRes == "") {
+    
+              res.status(404).json({
+                success: false,
+                message: "User Not Found. Please Check Your Email. Changing Password Failure."
+              });
+    
+            }
+            else
+            {
+              //result.agent.password = epass;
+              // console.log('mmmm', result);
+              // console.log('qqqq', updateRes);
+              // req.agent = result;
+              // delete req.agent.password;
+              // req.session.agent = result;
+              // delete req.session.agent.password;
+
+              res.status(200).json({
+                success: true,
+                message: "Password has been changed successfully. New password is " + epass
+              });
+            }
+          });
+        }
+      }
+    );
+   
+  });
 
   app.use("/agent", router);
 }; //signup controller end

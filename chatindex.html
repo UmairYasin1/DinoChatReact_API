@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" media="screen" href="/newWidget/assets/css/bootstrap.min.css">
+
+    <link href="/newWidget/assets/css/font-awesome.css" rel="stylesheet">
+
+    <link rel="stylesheet" media="screen" href="/newWidget/assets/css/dashboard.css">
+
+    <title>Dino Chat Widget Applied</title>
+
+    <style>
+        .chatOnsiteWidget {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            width: 260px;
+            height: 100px;
+        }
+
+        .chatOnsiteWidget a {
+            color: #000;
+            text-decoration: none;
+        }
+
+
+
+        .chatWithUsBox {
+            display: inline-block;
+            width: 160px;
+            box-shadow: 0 8px 18px 0 rgb(0 0 0 / 9%);
+            background-color: #ffffff;
+            text-align: center;
+            vertical-align: middle;
+            padding: 10px;
+            -webkit-border-top-right-radius: 10px;
+            -webkit-border-bottom-left-radius: 10px;
+            -moz-border-radius-topright: 10px;
+            -moz-border-radius-bottomleft: 10px;
+            border-top-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .chatWithUsBox img {
+            max-width: 23px;
+        }
+
+        .chatIcon {
+            display: inline-block;
+            width: 90px;
+            vertical-align: middle;
+        }
+
+
+        .chatIframeWrap {
+            position: fixed;
+            bottom: 100px;
+            right: 100px;
+        }
+
+        /* .chatIframeWrap .chatIframe {} */
+    </style>
+
+</head>
+
+<body>
+    <div class="chatOnsiteWidget">
+        <a href="javascript:;">
+            <span class="chatWithUsBox">Chat With Us <img src="D:/ChatsWorks/DinoChatReactAPI_Umair/public/newWidget/assets/images/wavehand.png" alt="-" /></span>
+            <span class="chatIcon">
+                <img src="D:/ChatsWorks/DinoChatReactAPI_Umair/public/newWidget/assets/images/chatwithus.png" alt="Chat With Us" class="img-responsive" />
+            </span>
+        </a>
+    </div>
+
+    <div class="chatIframeWrap" style="display: none;">
+        <iframe src="http://10.1.30.146:5001/newchat" class="chatIframe" width="380" height="500" frameborder="0"> </iframe>
+    </div>
+    <!-- #chatIframeWrap -->
+
+    <script src="D:/ChatsWorks/DinoChatReactAPI_Umair/public/newWidget/assets/js/jquery.min.js"></script>
+    <script src="D:/ChatsWorks/DinoChatReactAPI_Umair/public/newWidget/assets/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(".chatOnsiteWidget").click(function () {
+                $(".chatIframeWrap").toggle();
+            });
+        });
+    </script>
+</body>
+
+</html>
