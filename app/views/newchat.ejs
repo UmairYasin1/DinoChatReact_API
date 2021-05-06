@@ -97,12 +97,20 @@
         $("#hdnVisitorWebPath").val(document.referrer);
         
         var myCurl = window.location.href;
+<<<<<<< HEAD
         // myCurl = myCurl.split('?');
         // myCurl = myCurl[1].replace(/--/g,'/');
         // myCurl = myCurl.replace(/v=/g,'');
         // myCurl = myCurl.replace(/%3A/g,':');
         console.log(myCurl);
         myCurl = "https://webjazeera.com/";
+=======
+        myCurl = myCurl.split('?');
+        myCurl = myCurl[1].replace(/--/g,'/');
+        myCurl = myCurl.replace(/v=/g,'');
+        myCurl = myCurl.replace(/%3A/g,':');
+        console.log(myCurl);
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
         $("#hdnVisitorCompleteWebPath").val(myCurl);
 
         
@@ -388,8 +396,12 @@
     <a href="javascript:;">
       <span class="chatWithUsBox">Chat With Us <img src="/newWidget/assets/images/hand-slow.gif" alt="-" /></span>
       <span class="chatIcon">
+<<<<<<< HEAD
         <!-- <img src="/newWidget/assets/images/chatwithus.png" onclick="markMsgsRead()" alt="Chat With Us" class="img-responsive" /> -->
         <img src="/newWidget/assets/images/chatwithus.png" alt="Chat With Us" class="img-responsive" />
+=======
+        <img src="/newWidget/assets/images/chatwithus.png" onclick="markMsgsRead()" alt="Chat With Us" class="img-responsive" />
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
       </span>
     </a>
   </div>

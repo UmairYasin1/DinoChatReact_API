@@ -311,8 +311,12 @@ module.exports.sockets = function(http) {
                 visitor_uniqueNum : result.visitor_uniqueNum,
                 timezone_location : timezoneLocationVal,
                 no_of_visits : result.no_of_visits,
+<<<<<<< HEAD
                 web_path: result.web_path,
                 unReadMsgCount : unReadMsgCountVal
+=======
+                web_path: result.web_path
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
               }
 
               callback(response);
@@ -348,8 +352,12 @@ module.exports.sockets = function(http) {
                 visitor_uniqueNum : result.visitor_uniqueNum,
                 timezone_location : timezoneLocationVal,
                 no_of_visits : result.no_of_visits,
+<<<<<<< HEAD
                 web_path: result.web_path,
                 unReadMsgCount : unReadMsgCountVal
+=======
+                web_path: result.web_path
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
               }
 
               callback(response); 
@@ -399,8 +407,12 @@ module.exports.sockets = function(http) {
                       visitor_uniqueNum : result.visitor_uniqueNum,
                       timezone_location : timezoneLocationVal,
                       no_of_visits : result.no_of_visits,
+<<<<<<< HEAD
                       web_path: result.web_path,
                       unReadMsgCount : unReadMsgCountVal
+=======
+                      web_path: result.web_path
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
                     }
 
                       callback(response);
@@ -411,6 +423,7 @@ module.exports.sockets = function(http) {
                     //console.log('resppp check 1!!!');
                   if(res.name2 == "")
                   {
+<<<<<<< HEAD
                     console.log('resppp check 2!!!');
                     chatModel.countDocuments({ $and: [{ msgFrom: visitId, isRead: false }] }, function (err, count) {
                       
@@ -445,6 +458,32 @@ module.exports.sockets = function(http) {
                         unReadMsgCount : unReadMsgCountVal
 
                       }
+=======
+                    //console.log('2 else', res.name2);
+                    visit_name =  visit_name;
+                    agent_name = "";
+                    response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                      country: countryVal,
+                      browser: browserVal,
+                      os: osVal,
+                      platform: platformVal,
+                      ipaddress : ipAddressVal,
+                      totalhournumber : totalHoursVal,
+                      totaltimeshort : totalTimeShortVal,
+                      totaltimelong : totalTimeExpVal,
+                      createdate : createdDateVal,
+                      createdOn : result.createdOn,
+                      payment_link : result.payment_link,
+                      brand_name : result.brand_name,
+                      brand_id : result.brand_id,
+                      phone_number : result.phone_number,
+                      visitor_email : result.visitor_email,
+                      visitor_uniqueNum : result.visitor_uniqueNum,
+                      timezone_location : timezoneLocationVal,
+                      no_of_visits : result.no_of_visits,
+                      web_path: result.web_path
+                    }
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
 
                       callback(response);
                     });
@@ -461,6 +500,7 @@ module.exports.sockets = function(http) {
                   agentModel.findOne(
                     { $and: [{ agent_id : res.name2}] },
                     function(err, resp){
+<<<<<<< HEAD
 
                       //console.log('respp!!!', res.name2, ' !!! ', resp, '##', res);
                       chatModel.countDocuments({ $and: [{ msgFrom: res.name1, isRead: false }] }, function (err, count) {
@@ -493,6 +533,32 @@ module.exports.sockets = function(http) {
                         callback(response);
                       });
                       
+=======
+                      //console.log('where clyde is hardcode',resp.agent_name);
+                      response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,//agent_name : 'Clyde',
+                      country: countryVal,
+                      browser: browserVal,
+                      os: osVal,
+                      platform: platformVal,
+                      ipaddress : ipAddressVal,
+                      totalhournumber : totalHoursVal,
+                      totaltimeshort : totalTimeShortVal,
+                      totaltimelong : totalTimeExpVal,
+                      createdate : createdDateVal,
+                      createdOn : result.createdOn,
+                      payment_link : result.payment_link,
+                      brand_name : result.brand_name,
+                      brand_id : result.brand_id,
+                      phone_number : result.phone_number,
+                      visitor_email : result.visitor_email,
+                      visitor_uniqueNum : result.visitor_uniqueNum,
+                      timezone_location : timezoneLocationVal,
+                      no_of_visits : result.no_of_visits,
+                      web_path: result.web_path
+                    }
+
+                      callback(response);
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
                     }
                   )
 
@@ -727,15 +793,19 @@ module.exports.sockets = function(http) {
           }
           else
           {
-              console.log('ji bhai 3');
+              //console.log('ji bhai 3');
               socket.room =  obj._id;
               socket.join(socket.room);
               //console.log('rehan bhai', userSocket[socket.username]);
+<<<<<<< HEAD
               if(room.isVisitorList == false)
               {
                 console.log('<---- msgs is read update ----> ji bhai 3');
                 chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
               }
+=======
+              chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
               ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
               //ioChat.emit("update-room", socket.room);
               // ioChat.emit("test-sumair", socket.room);
@@ -832,6 +902,7 @@ module.exports.sockets = function(http) {
           visitId: visitorId
       };
       socket.to(socket.room).emit('typingResponse-saboor', data);
+<<<<<<< HEAD
     });
 
     socket.on("typingClear", function(visitorId) {
@@ -846,6 +917,22 @@ module.exports.sockets = function(http) {
       socket.to(socket.room).emit('payment-form-assignroom', socket.room);
     });
 
+=======
+    });
+
+    socket.on("typingClear", function(visitorId) {
+      socket.to(socket.room).emit('typingClearResponse', visitorId);
+    });
+
+
+    socket.on("show-payment-form-btn", function(data) {
+      //console.log(data);
+      //console.log('check socket.room', socket.room);
+      socket.to(socket.room).emit('show-payment-form-btn-ui', data);
+      socket.to(socket.room).emit('payment-form-assignroom', socket.room);
+    });
+
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
     socket.on('visitor-payment-response',function(data){
       // console.log('check console visitor payment resp', data);
       // console.log('check socket.room', data.room);
@@ -886,6 +973,7 @@ module.exports.sockets = function(http) {
       //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
     });
 
+<<<<<<< HEAD
     socket.on("active-visitor", function(data) {
       console.log('kamran bhai', data);
       isReadVisitorId = data.visitor_id;
@@ -903,6 +991,12 @@ module.exports.sockets = function(http) {
       //console.log('--------- socket io visitor -------', socket.room);
       //console.log('--------- visitor room id -------', roomId);
       console.log('saboor');
+=======
+    //for showing chats.
+    socket.on("chat-msg", function(data) {
+      // console.log('sokcet - room : ',socket.room);
+      //console.log('chat-msg saboor: ',data);
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
       const id = shortid.generate();
         //emits event to save chat to database.
         //console.log('dataSave.msgFrom',data.msgFrom);
@@ -1379,6 +1473,7 @@ module.exports.sockets = function(http) {
 
       // console.log('userSocket ---',userSocket);
       // console.log('visitorSocket ---',visitorSocket);
+<<<<<<< HEAD
 
       // console.log('userStack ****',userStack);
       // console.log('visitorStack ****',visitorStack);
@@ -1394,6 +1489,22 @@ module.exports.sockets = function(http) {
         //console.log('socket.username ^^^^^^',socket.username);
 
         
+=======
+
+      // console.log('userStack ****',userStack);
+      // console.log('visitorStack ****',visitorStack);
+
+      //console.log('socket.username ~~~~~',socket.username);
+
+      if(socket.username != undefined){
+
+        //console.log('socket.username ^^^^^^',socket.username);
+
+        _.unset(visitorSocket, socket.username);
+        visitorStack[socket.username] = "Offline";
+
+        ioChat.emit("onlineStack", visitorStack);
+>>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
       }
       
       //socket.emit('set-user-data', socket.username);
