@@ -106,20 +106,44 @@ const packageModel = mongoose.model("Package", packageSchema);
 
 const newPackage1 = new packageModel({
   package_id: shortid.generate(),
-  package_name: 'Package 1',
+  package_name: 'Basic - logo',
   createdOn: Date.now()
 });
 
 const newPackage2 = new packageModel({
   package_id: shortid.generate(),
-  package_name: 'Package 2',
+  package_name: 'Starup - logo',
+  createdOn: Date.now()
+});
+
+const newPackage3 = new packageModel({
+  package_id: shortid.generate(),
+  package_name: 'Basic - web',
+  createdOn: Date.now()
+});
+
+const newPackage4 = new packageModel({
+  package_id: shortid.generate(),
+  package_name: 'Startup - web',
+  createdOn: Date.now()
+});
+
+const newPackage5 = new packageModel({
+  package_id: shortid.generate(),
+  package_name: 'Basic - animation',
+  createdOn: Date.now()
+});
+
+const newPackage6 = new packageModel({
+  package_id: shortid.generate(),
+  package_name: 'Startup - animation',
   createdOn: Date.now()
 });
 
 
 
 packageModel.findOne(
-  { $and: [{ package_name: 'Package 1' }] },
+  { $and: [{ package_name: 'Basic - logo' }] },
   function(err, result) {
     if (result == null || result == undefined || result == "") {
       newPackage1.save();
@@ -128,10 +152,46 @@ packageModel.findOne(
 );
 
 packageModel.findOne(
-  { $and: [{ package_name: 'Package 2' }] },
+  { $and: [{ package_name: 'Starup - logo' }] },
   function(err, result) {
     if (result == null || result == undefined || result == "") {
       newPackage2.save();
+    } 
+  }
+);
+
+packageModel.findOne(
+  { $and: [{ package_name: 'Basic - web' }] },
+  function(err, result) {
+    if (result == null || result == undefined || result == "") {
+      newPackage3.save();
+    } 
+  }
+);
+
+packageModel.findOne(
+  { $and: [{ package_name: 'Startup - web' }] },
+  function(err, result) {
+    if (result == null || result == undefined || result == "") {
+      newPackage4.save();
+    } 
+  }
+);
+
+packageModel.findOne(
+  { $and: [{ package_name: 'Basic - animation' }] },
+  function(err, result) {
+    if (result == null || result == undefined || result == "") {
+      newPackage5.save();
+    } 
+  }
+);
+
+packageModel.findOne(
+  { $and: [{ package_name: 'Startup - animation' }] },
+  function(err, result) {
+    if (result == null || result == undefined || result == "") {
+      newPackage6.save();
     } 
   }
 );

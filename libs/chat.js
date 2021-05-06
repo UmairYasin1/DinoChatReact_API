@@ -12,6 +12,9 @@ require("../app/models/chat.js");
 require("../app/models/room.js");
 require("../app/models/agent.js");
 require("../app/models/visitor.js");
+require("../app/models/brand.js");
+require("../app/models/visitorpath.js");
+require("../app/models/package.js");
 
 //using mongoose Schema models
 const userModel = mongoose.model("User");
@@ -19,6 +22,9 @@ const chatModel = mongoose.model("Chat");
 const roomModel = mongoose.model("Room");
 const agentModel = mongoose.model("agent");
 const visitorModel = mongoose.model("visitor");
+const brandModel = mongoose.model("Brand");
+const visitorpathModel = mongoose.model("visitorPath");
+const packageModel = mongoose.model("Package");
 
 //reatime magic begins here
 module.exports.sockets = function(http) {
@@ -38,6 +44,7 @@ module.exports.sockets = function(http) {
   var allClients = [];
 
   var isReadVisitorId = 0;
+  var currentClickedVisitorArray = [];
   var isReadMsgId = 0;
   // socket io direct on
   // ioDirect.on("connection", function(socket) {
@@ -87,10 +94,12 @@ module.exports.sockets = function(http) {
           for (j in visitorStack) {
             if (j == i) {
               visitorStack[j] = "Online";
+              //console.log(visitorStack);
             }
           }
         }
         //for popping connection message.
+        //console.log('visitorStack',visitorStack);
         ioChat.emit("onlineStack", visitorStack);    
       }; //end of sendUserStack function.
 
@@ -117,6 +126,7 @@ module.exports.sockets = function(http) {
   socket.on("get_visitor_id", function(obj, callback) {
     var visitId = obj.visitorId;
     var agentId = obj.agentId;
+    var unReadMsgCountVal = 0;
     // console.log('visitId --1',visitId);
     // console.log('agentId --1',agentId);
     visitorModel.findOne(
@@ -250,6 +260,17 @@ module.exports.sockets = function(http) {
               }
             })();
 
+            var timezoneLocationVal2 = ( function() {
+              if(result.visitor_TimezoneLocation != '')
+              {
+                return result.visitor_TimezoneLocation;
+              }
+              else{
+                return "-";
+              }
+            })();
+
+
            // console.log(result.visitor_region_privateIp);
             
              var countryVal =  countryVal2;
@@ -261,6 +282,7 @@ module.exports.sockets = function(http) {
              var totalTimeShortVal = totalTimeShortVal2;
              var totalTimeExpVal = totalTimeExpVal2;
              var createdDateVal = createdDateVal2;
+             var timezoneLocationVal = timezoneLocationVal2;
 
             //#endregion
             
@@ -281,7 +303,16 @@ module.exports.sockets = function(http) {
                 totaltimelong : totalTimeExpVal,
                 createdate : createdDateVal,
                 createdOn : result.createdOn,
-                payment_link : result.payment_link
+                payment_link : result.payment_link,
+                brand_name : result.brand_name,
+                brand_id : result.brand_id,
+                phone_number : result.phone_number,
+                visitor_email : result.visitor_email,
+                visitor_uniqueNum : result.visitor_uniqueNum,
+                timezone_location : timezoneLocationVal,
+                no_of_visits : result.no_of_visits,
+                web_path: result.web_path,
+                unReadMsgCount : unReadMsgCountVal
               }
 
               callback(response);
@@ -293,9 +324,11 @@ module.exports.sockets = function(http) {
 
              if(visit_name == "")
              {
+              console.log('--00000--');
               visit_name =  "";
               agent_name = "";
 
+              
               response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
                 country: countryVal,
                 browser: browserVal,
@@ -307,13 +340,23 @@ module.exports.sockets = function(http) {
                 totaltimelong : totalTimeExpVal,
                 createdate : createdDateVal,
                 createdOn : result.createdOn,
-                payment_link : result.payment_link
+                payment_link : result.payment_link,
+                brand_name : result.brand_name,
+                brand_id : result.brand_id,
+                phone_number : result.phone_number,
+                visitor_email : result.visitor_email,
+                visitor_uniqueNum : result.visitor_uniqueNum,
+                timezone_location : timezoneLocationVal,
+                no_of_visits : result.no_of_visits,
+                web_path: result.web_path,
+                unReadMsgCount : unReadMsgCountVal
               }
 
               callback(response); 
              }
              else 
              {
+              //console.log('--11111--');
               visit_name =  visit_name;
 
               roomModel.findOne(
@@ -324,7 +367,8 @@ module.exports.sockets = function(http) {
                             $or: 
                             [
                               { name1 : visitId, name2 : agentId }, 
-                              { name1 : visitId, name2 : '' }
+                              { name1 : visitId, name2 : '' },
+                              { name1 : visitId, name2 : 'tFAE3OWtP' },
                             ]
                           }
                         ] 
@@ -347,7 +391,16 @@ module.exports.sockets = function(http) {
                       totaltimelong : totalTimeExpVal,
                       createdate : createdDateVal,
                       createdOn : result.createdOn,
-                      payment_link : result.payment_link
+                      payment_link : result.payment_link,
+                      brand_name : result.brand_name,
+                      brand_id : result.brand_id,
+                      phone_number : result.phone_number,
+                      visitor_email : result.visitor_email,
+                      visitor_uniqueNum : result.visitor_uniqueNum,
+                      timezone_location : timezoneLocationVal,
+                      no_of_visits : result.no_of_visits,
+                      web_path: result.web_path,
+                      unReadMsgCount : unReadMsgCountVal
                     }
 
                       callback(response);
@@ -355,54 +408,91 @@ module.exports.sockets = function(http) {
 
                   if(res!=null)
                   {
-             
+                    //console.log('resppp check 1!!!');
                   if(res.name2 == "")
                   {
-                    //console.log('2 else', res.name2);
-                    visit_name =  visit_name;
-                    agent_name = "";
-                    response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal,
-                      createdOn : result.createdOn,
-                      payment_link : result.payment_link
-                    }
+                    console.log('resppp check 2!!!');
+                    chatModel.countDocuments({ $and: [{ msgFrom: visitId, isRead: false }] }, function (err, count) {
+                      
+                      unReadMsgCountVal = count;
+                      console.log('there are %d jungle adventures', unReadMsgCountVal);
+
+                      console.log('--33333--', unReadMsgCountVal, visitId);
+                      //console.log('2 else', res.name2);
+                      visit_name =  visit_name;
+                      //agent_name = "";
+                      agent_name = "ChatBot";
+                      response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                        country: countryVal,
+                        browser: browserVal,
+                        os: osVal,
+                        platform: platformVal,
+                        ipaddress : ipAddressVal,
+                        totalhournumber : totalHoursVal,
+                        totaltimeshort : totalTimeShortVal,
+                        totaltimelong : totalTimeExpVal,
+                        createdate : createdDateVal,
+                        createdOn : result.createdOn,
+                        payment_link : result.payment_link,
+                        brand_name : result.brand_name,
+                        brand_id : result.brand_id,
+                        phone_number : result.phone_number,
+                        visitor_email : result.visitor_email,
+                        visitor_uniqueNum : result.visitor_uniqueNum,
+                        timezone_location : timezoneLocationVal,
+                        no_of_visits : result.no_of_visits,
+                        web_path: result.web_path,
+                        unReadMsgCount : unReadMsgCountVal
+
+                      }
 
                       callback(response);
+                    });
+                    
 
                   }
                   else
                   {
                     //console.log('4 else', res.name2);
                     // console.log('result -- 11', res);
-
+                    //console.log('--44444--');
+                    
                     visit_name =  visit_name;
                   agentModel.findOne(
                     { $and: [{ agent_id : res.name2}] },
                     function(err, resp){
-                      response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal,
-                      createdOn : result.createdOn,
-                      payment_link : result.payment_link
-                    }
 
-                      callback(response);
-  
+                      //console.log('respp!!!', res.name2, ' !!! ', resp, '##', res);
+                      chatModel.countDocuments({ $and: [{ msgFrom: res.name1, isRead: false }] }, function (err, count) {
+                        //console.log('there are %d jungle adventures', count);
+                        unReadMsgCountVal = count;
+                        //console.log('where clyde is hardcode',resp.agent_name);
+                        response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,//agent_name : 'Clyde',
+                          country: countryVal,
+                          browser: browserVal,
+                          os: osVal,
+                          platform: platformVal,
+                          ipaddress : ipAddressVal,
+                          totalhournumber : totalHoursVal,
+                          totaltimeshort : totalTimeShortVal,
+                          totaltimelong : totalTimeExpVal,
+                          createdate : createdDateVal,
+                          createdOn : result.createdOn,
+                          payment_link : result.payment_link,
+                          brand_name : result.brand_name,
+                          brand_id : result.brand_id,
+                          phone_number : result.phone_number,
+                          visitor_email : result.visitor_email,
+                          visitor_uniqueNum : result.visitor_uniqueNum,
+                          timezone_location : timezoneLocationVal,
+                          no_of_visits : result.no_of_visits,
+                          web_path: result.web_path,
+                          unReadMsgCount : unReadMsgCountVal
+                        }
+
+                        callback(response);
+                      });
+                      
                     }
                   )
 
@@ -461,10 +551,11 @@ module.exports.sockets = function(http) {
          );
   });
 
-  socket.on("get_reply_msg", function( msgId , callback) {
+  socket.on("get_reply_msg", function( data , callback) {
 
-     //console.log(msgId);
-
+     //console.log(data);
+      var msgId = data.msgId;
+      var isVisList = data.isVisitorList;
     //if(repId != ""){
      
 
@@ -485,8 +576,13 @@ module.exports.sockets = function(http) {
           // var isReadVal = dat.isRead;
           //var isReadVal = true;
           //chatModel.updateMany({"msgId": msgId}, {"$set":{"isRead": true}});
-          chatModel.update({"msgId": msgId, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
 
+          // if(isVisList == false)
+          // {
+          //   console.log('sunil bhai ----------------->>>>>>>>>>');
+          //   chatModel.update({"msgId": msgId, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+          // }
+          
           if(dat.repMsgId == ""){
             //console.log('11 else');
             response = {  repId: dat.repMsgId, 
@@ -574,14 +670,18 @@ module.exports.sockets = function(http) {
     }); //end of set-room event.
 
     socket.on("update-room", function(room) {
-      // console.log('muzaffar room back',room);
-      // console.log('muzaffar room agentId',room.agent_id);
-      //console.log('muzaffar room visitorId',room.visitor_id.id);
+      console.log('muzaffar room back',room);
+      console.log('muzaffar room agentId',room.agent_id);
+      console.log('muzaffar room visitorId',room.visitor_id.id);
+
+      console.log('muzaffar room isVisitorList',room.isVisitorList);
+      console.log('muzaffar room page',room.page);
       const filter = { name1: room.visitor_id.id };
       const update = { name2: room.agent_id };
 
       roomModel.findOne({ name1: room.visitor_id.id }, function(err,obj) { 
         //console.log('room->',room.visitor_id.id);
+        //console.log('obj.name2', obj.name2);
         if(err)
         {
           socket.room =  obj._id;
@@ -590,18 +690,39 @@ module.exports.sockets = function(http) {
         }
         if(obj != null)
         {
-          //console.log('ji bhai');
+          console.log('ji bhai');
           if(obj.name2 == "")
           {
-            //console.log('ji bhai 2');
+            console.log('ji bhai 2');
             roomModel.findOneAndUpdate(
               filter , update , function(err, result) {
               socket.room = result._id;
               chatModel.updateMany({ room : socket.room } , {$set: { msgTo: room.agent_id }} , function(err, result) { }  )
-              chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
-                socket.room = result._id;
-                socket.join(socket.room);
-                ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
+              if(room.isVisitorList == false)
+              {
+                console.log('<---- msgs is read update ----> ji bhai 2');
+                chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+              }
+              socket.room = result._id;
+              socket.join(socket.room);
+              ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
+            });
+          }
+          else if(obj.name2 == "tFAE3OWtP")
+          {
+            console.log('ji bhai 2.11');
+            roomModel.findOneAndUpdate(
+              filter , update , function(err, result) {
+              socket.room = result._id;
+              chatModel.updateMany({ room : socket.room } , {$set: { msgTo: room.agent_id }} , function(err, result) { }  )
+              if(room.isVisitorList == false)
+              {
+                console.log('<---- msgs is read update ----> ji bhai 2.11');
+                chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+              }
+              socket.room = result._id;
+              socket.join(socket.room);
+              ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
             });
           }
           else
@@ -609,8 +730,12 @@ module.exports.sockets = function(http) {
               console.log('ji bhai 3');
               socket.room =  obj._id;
               socket.join(socket.room);
-              console.log('rehan bhai', userSocket[socket.username]);
-              chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+              //console.log('rehan bhai', userSocket[socket.username]);
+              if(room.isVisitorList == false)
+              {
+                console.log('<---- msgs is read update ----> ji bhai 3');
+                chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+              }
               ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
               //ioChat.emit("update-room", socket.room);
               // ioChat.emit("test-sumair", socket.room);
@@ -618,7 +743,57 @@ module.exports.sockets = function(http) {
           }
         } 
       });
-    }); //end of set-room event.
+    }); 
+
+
+    // socket.on("update-room-unassigned", function(room) {
+    //   console.log('muzaffar room back',room);
+    //   console.log('muzaffar room agentId',room.agent_id);
+    //   console.log('muzaffar room visitorId',room.visitor_id.id);
+    //   const filter = { name1: room.visitor_id.id };
+    //   const update = { name2: room.agent_id };
+
+    //   roomModel.findOne({ name1: room.visitor_id.id }, function(err,obj) { 
+    //     //console.log('room->',room.visitor_id.id);
+    //     console.log('obj.name2', obj.name2);
+    //     if(err)
+    //     {
+    //       socket.room =  obj._id;
+    //       socket.join(socket.room);
+    //       ioChat.to(userSocket[socket.username]).emit("update-room-unassigned", socket.room);
+    //     }
+    //     if(obj != null)
+    //     {
+    //       console.log('ji bhai');
+    //       if(obj.name2 == "")
+    //       {
+    //         console.log('ji bhai 2');
+    //         roomModel.findOneAndUpdate(
+    //           filter , update , function(err, result) {
+    //           socket.room = result._id;
+    //           chatModel.updateMany({ room : socket.room } , {$set: { msgTo: room.agent_id }} , function(err, result) { }  )
+    //           chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+    //             socket.room = result._id;
+    //             socket.join(socket.room);
+    //             ioChat.to(userSocket[socket.username]).emit("update-room-unassigned", socket.room);
+    //         });
+    //       }
+    //       else
+    //       {
+    //           console.log('ji bhai 3');
+    //           socket.room =  obj._id;
+    //           socket.join(socket.room);
+    //           //console.log('rehan bhai', userSocket[socket.username]);
+    //           chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+    //           ioChat.to(userSocket[socket.username]).emit("update-room-unassigned", socket.room);
+    //           //ioChat.emit("update-room", socket.room);
+    //           // ioChat.emit("test-sumair", socket.room);
+    //           // console.log('kamran ', userSocket[socket.username]);
+    //       }
+    //     } 
+    //   });
+    // }); //end of set-room event.
+
 
 
     //emits event to read old-chats-init from database.
@@ -650,12 +825,33 @@ module.exports.sockets = function(http) {
     };
 
     //showing msg on typing.
-    socket.on("typing", function(val) {
-      socket.to(socket.room).broadcast.emit('typingResponse', val);
+    socket.on("typing", function(val, visitorId) {
+      socket.to(socket.room).emit('typingResponse', val, visitorId);
+      var data = {
+          messageVal: val,
+          visitId: visitorId
+      };
+      socket.to(socket.room).emit('typingResponse-saboor', data);
     });
 
-    socket.on("typingClear", function() {
-      socket.to(socket.room).broadcast.emit('typingClearResponse');
+    socket.on("typingClear", function(visitorId) {
+      socket.to(socket.room).emit('typingClearResponse', visitorId);
+    });
+
+
+    socket.on("show-payment-form-btn", function(data) {
+      //console.log(data);
+      //console.log('check socket.room', socket.room);
+      socket.to(socket.room).emit('show-payment-form-btn-ui', data);
+      socket.to(socket.room).emit('payment-form-assignroom', socket.room);
+    });
+
+    socket.on('visitor-payment-response',function(data){
+      // console.log('check console visitor payment resp', data);
+      // console.log('check socket.room', data.room);
+      socket.to(data.room).emit('send-visitor-payment-paid-msg',data);
+      //socket.emit('chat-msg',{msg:result.message, msgFrom : visitorId ,msgTo:"",date:Date.now(),type:"visitor",file:result.file,repMsgId:result.replymsgId});
+      //socket.emit('chat-msg',{msg:data.msg, msgFrom: data.msgFrom, msgTo:"", date:Date.now(),type:data.type,file:"",repMsgId: ""});
     });
 
     // socket.on('typing', function(val){ 
@@ -684,67 +880,455 @@ module.exports.sockets = function(http) {
 
     socket.on("msg-is-read", function(data) {
       console.log('nasir bhai', data);
-      isReadVisitorId = data.visitor_id;
+      //isReadVisitorId = data.visitor_id;
       isReadMsgId = data.msgId;
       // chatModel.update({"msgFrom": data.visitor_id}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
       //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
     });
 
-    //for showing chats.
-    socket.on("chat-msg", function(data) {
-      // console.log('sokcet - room : ',socket.room);
-      console.log('chat-msg saboor: ',data);
+    socket.on("active-visitor", function(data) {
+      console.log('kamran bhai', data);
+      isReadVisitorId = data.visitor_id;
+      // currentClickedVisitorArray.push(isReadVisitorId);
+      // console.log('current vis array', currentClickedVisitorArray);
+      //isReadMsgId = data.msgId;
+      // chatModel.update({"msgFrom": data.visitor_id}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+      //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
+    });
+
+    socket.on('get-current-visitor-response', function(currentVis, data, roomId){
+      //console.log('check hogaya visitor'+ currentVis);
+      //console.log('check hogaya visitor data'+ JSON.stringify(data));
+      //var dataSave = JSON.stringify(data);
+      //console.log('--------- socket io visitor -------', socket.room);
+      //console.log('--------- visitor room id -------', roomId);
+      console.log('saboor');
       const id = shortid.generate();
-      //emits event to save chat to database.
-      eventEmitter.emit("save-chat", {
-        msgFrom: data.msgFrom,
-        msgTo: data.msgTo,
-        msg: data.msg,
-        file : data.file,
-        room: socket.room,
-        type: data.type,
-        id: id,
-        repMsgId: data.repMsgId,
-        date: data.date
-      });
+        //emits event to save chat to database.
+        //console.log('dataSave.msgFrom',data.msgFrom);
+        if(currentVis == data.msgFrom)
+        {
+          //console.log('is read true');
 
-      //emits event to send chat msg to all clients.
-       if(data.repMsgId != ""){
-        chatModel.findOne(
-          { $and: [{ msgId : data.repMsgId}] },
-          function(err, res){
+          eventEmitter.emit("save-chat", {
+            msgFrom: data.msgFrom,
+            msgTo: data.msgTo,
+            msg: data.msg,
+            file : data.file,
+            // room: socket.room,
+            room: roomId,
+            type: data.type,
+            id: id,
+            repMsgId: data.repMsgId,
+            date: data.date,
+            isRead: true
+          });
+        }
+        else{
+          //console.log('is read false');
 
-            ioChat.to(socket.room).emit("chat-msg", {
+          eventEmitter.emit("save-chat", {
+            msgFrom: data.msgFrom,
+            msgTo: data.msgTo,
+            msg: data.msg,
+            file : data.file,
+            // room: socket.room,
+            room: roomId,
+            type: data.type,
+            id: id,
+            repMsgId: data.repMsgId,
+            date: data.date,
+            isRead: false
+          });
+        }
+        
+  
+        //emits event to send chat msg to all clients.
+         if(data.repMsgId != ""){
+          chatModel.findOne(
+            { $and: [{ msgId : data.repMsgId}] },
+            function(err, res){
+              if(currentVis == data.msgFrom)
+              {
+                // ioChat.to(socket.room).emit("chat-msg", {
+                ioChat.to(roomId).emit("chat-msg", {
+                  msgFrom: data.msgFrom,
+                  file: data.file,
+                  msg: data.msg,
+                  id: id,
+                  date: data.date,
+                  repFrom : res.msgFrom,
+                  repTo : res.msgTo,
+                  repMsg : res.msg,
+                  repfile: res.file,
+                  repDate: res.createdOn,
+                  isRead : true
+                });
+              }
+              else
+              {
+                // ioChat.to(socket.room).emit("chat-msg", {
+                ioChat.to(roomId).emit("chat-msg", {
+                  msgFrom: data.msgFrom,
+                  file: data.file,
+                  msg: data.msg,
+                  id: id,
+                  date: data.date,
+                  repFrom : res.msgFrom,
+                  repTo : res.msgTo,
+                  repMsg : res.msg,
+                  repfile: res.file,
+                  repDate: res.createdOn,
+                  isRead : false
+                });
+              }
+              
+              
+            }
+          )
+         }else{
+           //console.log(' socket.room 2',socket.room);
+           //console.log(' socket.room 3',data.date);
+           if(currentVis == data.msgFrom)
+           {
+            // ioChat.to(socket.room).emit("chat-msg", {
+            ioChat.to(roomId).emit("chat-msg", {
               msgFrom: data.msgFrom,
               file: data.file,
               msg: data.msg,
               id: id,
               date: data.date,
-              repFrom : res.msgFrom,
-              repTo : res.msgTo,
-              repMsg : res.msg,
-              repfile: res.file,
-              repDate: res.createdOn,
+              repMsg : "",
+              isRead : true
+            });
+           }
+           else
+           {
+            // ioChat.to(socket.room).emit("chat-msg", {
+            ioChat.to(roomId).emit("chat-msg", {
+              msgFrom: data.msgFrom,
+              file: data.file,
+              msg: data.msg,
+              id: id,
+              date: data.date,
+              repMsg : "",
               isRead : false
             });
+           }
+           
+         }
+
+    });
+
+    // socket.on('get-current-visitor-response', function(currentVis, data){
+    //   console.log('check hogaya visitor'+ currentVis);
+    //   //console.log('check hogaya visitor data'+ JSON.stringify(data));
+    //   //var dataSave = JSON.stringify(data);
+    //   console.log('--------- socket io visitor -------', socket.room);
+
+    //   const id = shortid.generate();
+    //     //emits event to save chat to database.
+    //     console.log('dataSave.msgFrom',data.msgFrom);
+    //     eventEmitter.emit("save-chat", {
+    //       msgFrom: data.msgFrom,
+    //       msgTo: data.msgTo,
+    //       msg: data.msg,
+    //       file : data.file,
+    //       room: socket.room,
+    //       type: data.type,
+    //       id: id,
+    //       repMsgId: data.repMsgId,
+    //       date: data.date,
+    //       isRead: true
+    //     });
+        
+  
+    //     //emits event to send chat msg to all clients.
+    //      if(data.repMsgId != ""){
+    //       chatModel.findOne(
+    //         { $and: [{ msgId : data.repMsgId}] },
+    //         function(err, res){
+    //           ioChat.to(socket.room).emit("chat-msg", {
+    //             msgFrom: data.msgFrom,
+    //             file: data.file,
+    //             msg: data.msg,
+    //             id: id,
+    //             date: data.date,
+    //             repFrom : res.msgFrom,
+    //             repTo : res.msgTo,
+    //             repMsg : res.msg,
+    //             repfile: res.file,
+    //             repDate: res.createdOn,
+    //             isRead : true
+    //           });
+              
+    //         }
+    //       )
+    //      }else{
+    //        //console.log(' socket.room 2',socket.room);
+    //        //console.log(' socket.room 3',data.date);
+    //        ioChat.to(socket.room).emit("chat-msg", {
+    //         msgFrom: data.msgFrom,
+    //         file: data.file,
+    //         msg: data.msg,
+    //         id: id,
+    //         date: data.date,
+    //         repMsg : "",
+    //         isRead : true
+    //       });
+           
+    //      }
+
+    // });
+
+    //for showing chats.
+    socket.on("chat-msg", function(data) {
+      // console.log('sokcet - room : ',socket.room);
+      console.log('chat-msg saboor: ',data);
+      if(data.type == "visitor")
+      {
+        // ioChat.emit('get-current-visitor-req', data);
+        //console.log(data, socket.room);
+        roomModel.findOne({ _id: socket.room }, function(err,obj) { 
+          if(obj.name2 == '')
+          {
+            //#region un assigned visitor msg save
+            //console.log('*******');
+            const id = shortid.generate();
+            //emits event to save chat to database.
+            eventEmitter.emit("save-chat", {
+              msgFrom: data.msgFrom,
+              msgTo: data.msgTo,
+              msg: data.msg,
+              file : data.file,
+              room: socket.room,
+              type: data.type,
+              id: id,
+              repMsgId: data.repMsgId,
+              date: data.date,
+              isRead: false
+            });
+      
+            //emits event to send chat msg to all clients.
+            if(data.repMsgId != ""){
+              chatModel.findOne(
+                { $and: [{ msgId : data.repMsgId}] },
+                function(err, res){
+      
+                  ioChat.to(socket.room).emit("chat-msg", {
+                    msgFrom: data.msgFrom,
+                    file: data.file,
+                    msg: data.msg,
+                    id: id,
+                    date: data.date,
+                    repFrom : res.msgFrom,
+                    repTo : res.msgTo,
+                    repMsg : res.msg,
+                    repfile: res.file,
+                    repDate: res.createdOn,
+                    isRead : false
+                  });
+                  
+                }
+              )
+            }else{
+              //console.log(' socket.room 2',socket.room);
+              //console.log(' socket.room 3',data.date);
+              ioChat.to(socket.room).emit("chat-msg", {
+                msgFrom: data.msgFrom,
+                file: data.file,
+                msg: data.msg,
+                id: id,
+                date: data.date,
+                repMsg : "",
+                isRead : false
+              });
+            }
+
+            //#endregion
+          }
+          else
+          {
+            //console.log('~~~~~~~~~ msg nae araha ~~~~~~~~', obj);
+            if(agentStack[obj.name2] == "Online")
+            {
+              ioChat.emit('get-current-visitor-req', data, socket.room);
+            }
+            else
+            {
+              console.log('~~~~~~~~~ agent is offline ~~~~~~~~~', data);
+              const id = shortid.generate();
+
+              eventEmitter.emit("save-chat", {
+                msgFrom: data.msgFrom,
+                msgTo: obj.name2,
+                msg: data.msg,
+                file : data.file,
+                room: socket.room,
+                type: data.type,
+                id: id,
+                repMsgId: data.repMsgId,
+                date: data.date,
+                isRead: false
+              });
+              
+              //emits event to send chat msg to all clients.
+              if(data.repMsgId != ""){
+                chatModel.findOne(
+                  { $and: [{ msgId : data.repMsgId}] },
+                  function(err, res){
+                    ioChat.to(socket.room).emit("chat-msg", {
+                      msgFrom: data.msgFrom,
+                      file: data.file,
+                      msg: data.msg,
+                      id: id,
+                      date: data.date,
+                      repFrom : res.msgFrom,
+                      repTo : res.msgTo,
+                      repMsg : res.msg,
+                      repfile: res.file,
+                      repDate: res.createdOn,
+                      isRead : false
+                    });
+                  }
+                )
+              }
+              else
+              {
+                ioChat.to(socket.room).emit("chat-msg", {
+                  msgFrom: data.msgFrom,
+                  file: data.file,
+                  msg: data.msg,
+                  id: id,
+                  date: data.date,
+                  repMsg : "",
+                  isRead : false
+                });
+              }
+
+              //console.log('mil gaya ++++++++++++++++++++++++++++++',agentStack);
+            }
             
           }
-        )
-       }else{
-         //console.log(' socket.room 2',socket.room);
-         //console.log(' socket.room 3',data.date);
-         ioChat.to(socket.room).emit("chat-msg", {
-           msgFrom: data.msgFrom,
-           file: data.file,
-           msg: data.msg,
-           id: id,
-           date: data.date,
-           repMsg : "",
-           isRead : false
-         });
-       }
+        });
+                
+      }
+      else if(data.type == "agent")
+      {
+        //console.log('--------- socket io agent -------', socket.room);
+
+        const id = shortid.generate();
+        //emits event to save chat to database.
+        eventEmitter.emit("save-chat", {
+          msgFrom: data.msgFrom,
+          msgTo: data.msgTo,
+          msg: data.msg,
+          file : data.file,
+          room: socket.room,
+          type: data.type,
+          id: id,
+          repMsgId: data.repMsgId,
+          date: data.date,
+          isRead: false
+        });
+  
+        //emits event to send chat msg to all clients.
+         if(data.repMsgId != ""){
+          chatModel.findOne(
+            { $and: [{ msgId : data.repMsgId}] },
+            function(err, res){
+  
+              ioChat.to(socket.room).emit("chat-msg", {
+                msgFrom: data.msgFrom,
+                file: data.file,
+                msg: data.msg,
+                id: id,
+                date: data.date,
+                repFrom : res.msgFrom,
+                repTo : res.msgTo,
+                repMsg : res.msg,
+                repfile: res.file,
+                repDate: res.createdOn,
+                isRead : false
+              });
+              
+            }
+          )
+         }else{
+           //console.log(' socket.room 2',socket.room);
+           //console.log(' socket.room 3',data.date);
+           ioChat.to(socket.room).emit("chat-msg", {
+             msgFrom: data.msgFrom,
+             file: data.file,
+             msg: data.msg,
+             id: id,
+             date: data.date,
+             repMsg : "",
+             isRead : false
+           });
+         }
+      }
       
     });
+
+
+    // socket.on("chat-msg", function(data) 
+    // {
+
+    //   console.log('--------- socket io agent -------', socket.room);
+    //   const id = shortid.generate();
+        
+    //   eventEmitter.emit("save-chat", {
+    //       msgFrom: data.msgFrom,
+    //       msgTo: data.msgTo,
+    //       msg: data.msg,
+    //       file : data.file,
+    //       room: socket.room,
+    //       type: data.type,
+    //       id: id,
+    //       repMsgId: data.repMsgId,
+    //       date: data.date,
+    //       isRead: false
+    //     });
+  
+    //     //emits event to send chat msg to all clients.
+    //      if(data.repMsgId != "")
+    //      {
+    //       chatModel.findOne(
+    //         { $and: [{ msgId : data.repMsgId}] },
+    //         function(err, res){
+  
+    //           ioChat.to(socket.room).emit("chat-msg", {
+    //             msgFrom: data.msgFrom,
+    //             file: data.file,
+    //             msg: data.msg,
+    //             id: id,
+    //             date: data.date,
+    //             repFrom : res.msgFrom,
+    //             repTo : res.msgTo,
+    //             repMsg : res.msg,
+    //             repfile: res.file,
+    //             repDate: res.createdOn,
+    //             isRead : false
+    //           });
+              
+    //         }
+    //       )
+    //      }
+    //      else
+    //      {
+    //        ioChat.to(socket.room).emit("chat-msg", {
+    //          msgFrom: data.msgFrom,
+    //          file: data.file,
+    //          msg: data.msg,
+    //          id: id,
+    //          date: data.date,
+    //          repMsg : "",
+    //          isRead : false
+    //        });
+    //      }
+      
+    // });
 
     //for popping page notification
     socket.on('new_notification', function(data) {
@@ -756,6 +1340,25 @@ module.exports.sockets = function(http) {
       });
     });
 
+    socket.on("agent-logout", function(data) {
+      console.log(data);
+      console.log('agentStack',agentStack);
+      console.log("agent chat disconnected.");
+
+      if(socket.username != undefined)
+      {
+        _.unset(agentSocket, socket.username);
+        agentStack[data] = "Offline";
+
+      }
+      console.log('agentStack offline',agentStack);
+      
+    });
+
+    function waitVisitorToDisconnect()
+    {
+      ioChat.emit("onlineStack", visitorStack);
+    }
     //for popping disconnection message.
     socket.on("disconnect", function() {
 
@@ -766,13 +1369,35 @@ module.exports.sockets = function(http) {
       socket.broadcast.emit("broadcast", {
         description: socket.username + " Logged out"
       });
-
+      isReadVisitorId = 0;
+      console.log('agentStack',agentStack);
       console.log("chat disconnected.");
 
       _.unset(userSocket, socket.username);
       userStack[socket.username] = "Offline";
+      
 
-     // ioChat.emit("onlineStack", userStack);
+      // console.log('userSocket ---',userSocket);
+      // console.log('visitorSocket ---',visitorSocket);
+
+      // console.log('userStack ****',userStack);
+      // console.log('visitorStack ****',visitorStack);
+
+      //console.log('socket.username ~~~~~',socket.username);
+
+      if(socket.username != undefined)
+      {
+        _.unset(visitorSocket, socket.username);
+        visitorStack[socket.username] = "Offline";
+        
+        setTimeout(waitVisitorToDisconnect, 15000);
+        //console.log('socket.username ^^^^^^',socket.username);
+
+        
+      }
+      
+      //socket.emit('set-user-data', socket.username);
+      //ioChat.emit("onlineStack", userStack);
     }); //end of disconnect event.
   }); //end of ioDirect.on(connection).
   //end of socket.io code for chat feature.
@@ -781,8 +1406,9 @@ module.exports.sockets = function(http) {
   //saving chats to database.
   eventEmitter.on("save-chat", function(data) {
     // var today = Date.now();
-    //console.log(data);
+    //console.log('save-chat',data);
     if(data.type=="agent"){
+      console.log('agent');
      var newChat = new chatModel({
        msgFrom: data.msgFrom,
        msgTo: data.msgTo,
@@ -804,9 +1430,12 @@ module.exports.sockets = function(http) {
       }
     });
     
-  }else{
+    }
+    else
+    {
+      //console.log('visitor');
       roomModel.findOne({ _id: data.room }, function(err,obj) { 
-        
+        //console.log('checking payement resp msg ', obj);
         agent_id = obj.name2;
 
         if(agent_id == ""){
@@ -819,7 +1448,8 @@ module.exports.sockets = function(http) {
             file: data.file,
             msgId:data.id,
             room: data.room,
-            createdOn: data.date
+            createdOn: data.date,
+            isRead: data.isRead
           });
 
           newChat.save(function(err, result) {
@@ -836,7 +1466,39 @@ module.exports.sockets = function(http) {
 
         }else{
 
+          
+
           agentModel.findOne({ agent_id: agent_id } , function(err,res){
+            console.log('isReadVisitorId -->',isReadVisitorId);
+            // if(isReadVisitorId == data.msgFrom)
+            // {
+            //   var newChat = new chatModel({
+            //     msgFrom: data.msgFrom,
+            //     msgTo: res.agent_id,
+            //     msgId:data.id,
+            //     msg: data.msg,
+            //     repMsgId : data.repMsgId,
+            //     file: data.file,
+            //     room: data.room,
+            //     createdOn: data.date,
+            //     isRead: data.isRead
+            //   });
+            // }
+            // else
+            // {
+            //   var newChat = new chatModel({
+            //     msgFrom: data.msgFrom,
+            //     msgTo: res.agent_id,
+            //     msgId:data.id,
+            //     msg: data.msg,
+            //     repMsgId : data.repMsgId,
+            //     file: data.file,
+            //     room: data.room,
+            //     createdOn: data.date,
+            //     isRead: data.isRead
+            //   });
+            // }
+            
             var newChat = new chatModel({
               msgFrom: data.msgFrom,
               msgTo: res.agent_id,
@@ -845,9 +1507,9 @@ module.exports.sockets = function(http) {
               repMsgId : data.repMsgId,
               file: data.file,
               room: data.room,
-              createdOn: data.date
+              createdOn: data.date,
+              isRead: data.isRead
             });
-
             newChat.save(function(err, result) {
               if (err) {
                 console.log("Error : " + err);
@@ -858,11 +1520,11 @@ module.exports.sockets = function(http) {
                 //   console.log('obj result ', obj);
                 // });
                 console.log('is read vis id', isReadVisitorId);
-                if(isReadVisitorId != 0)
-                {
-                    console.log('isReadMsgId', isReadMsgId);
-                    chatModel.update({"msgId": isReadMsgId}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
-                }
+                // if(isReadVisitorId != 0)
+                // {
+                //     console.log('isReadMsgId', isReadMsgId);
+                //     chatModel.update({"msgId": isReadMsgId}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+                // }
                 console.log("Chat Saved 3.");
               }
            
@@ -873,10 +1535,6 @@ module.exports.sockets = function(http) {
 
         }
 
-
-
-          
-      
       });
 
     }
@@ -1006,6 +1664,8 @@ module.exports.sockets = function(http) {
   //
   //
 
+  //#region signup 
+
   //to verify for unique username and email at signup.
   //socket namespace for signup.
   const ioSignup = ioDirect.of("/signup");
@@ -1051,6 +1711,11 @@ module.exports.sockets = function(http) {
     });
   }); //end of ioSignup connection event.
 
+  //#endregion
+  
+  
+  //#region agent
+
   const ioAgent = ioDirect.of("/agent");
 
   let checkAgentEmail; //declaring variables for function.
@@ -1071,7 +1736,7 @@ module.exports.sockets = function(http) {
 
     //on disconnection.
     socket.on("disconnect", function() {
-      console.log("signup disconnected.");
+      console.log("agent disconnected.");
     });
   }); //end of ioSignup connection event.
 
@@ -1138,6 +1803,211 @@ module.exports.sockets = function(http) {
         }
       );
     }); //end of findUsername event.
+
+  //#endregion
+
+
+  //#region new visitor
+
+  // const ioNewVisitor = ioDirect.of("/newvisitor");
+
+  // ioNewVisitor.on("connection", function(socket) {
+  //   console.log("newvisitor signup connected.");
+
+  //   socket.on('save-walking-customer',function(data, callback){
+  //     //console.log("data server",data.visitor_uniqueNumVal);
+
+  //     //#region make user
+
+  //     visitorModel.findOne(
+  //       { $and: [{ visitor_uniqueNum: data.visitor_uniqueNumVal }] },
+  //       function(err, result) {
+  //         if (result == null || result == undefined || result == "") {
+
+  //           brandModel.findOne(
+  //             { brand_url: { $regex: '.*' + data.visitor_host + '.*' } },
+  //             function(err, result) {
+  //               if (result != null || result != undefined || result != "") 
+  //               {
+  //                   const today = Date.now();
+  //                   const id = shortid.generate();
+                
+  //                   //console.log([data.visitor_GeoLocValue]);
+  //                   const newVisitor = new visitorModel({
+  //                     visitor_id: id,
+  //                     visitor_name: "WC_" + id,
+  //                     visitor_email: "walkingcustomer_" + id + "@dc.com",
+  //                     visitor_uniqueNum: data.visitor_uniqueNumVal,
+  //                     phone_number: "000",
+  //                     web_path: data.visitor_web_path,
+  //                     brand_id : result.brand_id,
+  //                     brand_name : result.brand_name,
+  //                     visitor_publicIp: data.visitor_PublicIpValue,
+  //                     visitor_privateIp: data.visitor_PrivateIpValue,
+  //                     visitor_region_publicIp: data.visitor_GeoLocValue,
+  //                     visitor_region_privateIp: data.visitor_GeoLocValuePrivate,
+  //                     visitor_browser_and_os: data.visitor_BrowserAndOSValue,
+  //                     visitor_TimezoneLocation: data.visitor_TimezoneLocation,
+  //                     createdOn: today
+  //                 });
+
+  //                 //console.log(newVisitor);
+                
+  //                 newVisitor.save(function(err, result) {
+  //                   if (err) {
+  //                     console.log('error 1');
+  //                     res.status(500).json({
+  //                       success: false,
+  //                       message: "Some Error Occured"
+  //                     });
+                
+  //                   } else if (result == null || result == undefined || result == "") {
+  //                     console.log('error 2');
+  //                     res.status(404).json({
+  //                       success: false,
+  //                       message: "Data Not Found"
+  //                     });
+                
+  //                   } 
+  //                   else 
+  //                   {
+  //                     //console.log('solve');
+  //                     if(data.visitor_web_path != null || data.visitor_web_path != undefined || data.visitor_web_path != "")
+  //                     {
+  //                       const pathDate = Date.now();
+  //                       const pathShortId = shortid.generate();
+  //                       const newVisitorPath = new visitorpathModel({
+  //                         path_id: pathShortId,
+  //                         visitor_id: result.visitor_id,
+  //                         visitor_name: result.visitor_name,
+  //                         visitor_email: result.visitor_email,
+  //                         visitor_uniqueNum: result.visitor_uniqueNum,
+  //                         completePath: data.visitor_web_path,
+  //                         createdOn: pathDate
+  //                       });
+  //                       newVisitorPath.save();
+  //                     }
+
+  //                     // response = {  repId: dat.repMsgId, 
+  //                     //   msgId: msgId , 
+  //                     //   msgFrom : ""  , 
+  //                     //   msgTo : "",
+  //                     //   msg : "", 
+  //                     //   file : "", 
+  //                     //   createdOn : "",
+  //                     //   repmsgFrom :msgFrom  , 
+  //                     //   repmsgTo : msgTo,
+  //                     //   repmsg : msg, 
+  //                     //   repfile : file, 
+  //                     //   repcreatedOn : createdOn,
+  //                     //   reproomId : room,
+  //                     //   repIsRead : dat.isRead
+  //                     // }
+                
+  //                     callback(result.visitor_id);
+  //                   }
+  //                 });
+  //               }
+  //             });
+            
+  //         } 
+  //         else{
+  //           if(data.visitor_web_path != null || data.visitor_web_path != undefined || data.visitor_web_path != "")
+  //           {
+  //             const pathDate = Date.now();
+  //             const pathShortId = shortid.generate();
+  //             const newVisitorPath = new visitorpathModel({
+  //               path_id: pathShortId,
+  //               visitor_id: result.visitor_id,
+  //               visitor_name: result.visitor_name,
+  //               visitor_email: result.visitor_email,
+  //               visitor_uniqueNum: result.visitor_uniqueNum,
+  //               completePath: data.visitor_web_path,
+  //               createdOn: pathDate
+  //             });
+  //             newVisitorPath.save();
+  //           }  
+  //           callback(result.visitor_id);
+  //         }
+  //       }
+  //     );
+
+  //     // response = {  repId: dat.repMsgId, 
+  //     //   msgId: msgId , 
+  //     //   msgFrom : ""  , 
+  //     //   msgTo : "",
+  //     //   msg : "", 
+  //     //   file : "", 
+  //     //   createdOn : "",
+  //     //   repmsgFrom :msgFrom  , 
+  //     //   repmsgTo : msgTo,
+  //     //   repmsg : msg, 
+  //     //   repfile : file, 
+  //     //   repcreatedOn : createdOn,
+  //     //   reproomId : room,
+  //     //   repIsRead : dat.isRead
+  //     // }
+
+  //     // callback(response);
+
+  //     //#endregion
+  //   });   
+    
+  //   socket.on("set-user-data", function(username) {
+  //     // const username = 'rBXxhnFCR';
+  //     console.log(username + "  logged In");
+
+  //     //storing variable.
+  //     socket.username = username;
+  //     userSocket[socket.username] = socket.id;
+  //     visitorSocket[socket.username] = socket.id;
+  //     agentSocket[socket.username] = socket.id;
+
+  //     socket.broadcast.emit("broadcast", {
+  //       description: username + " Logged In on signup"
+  //     });
+
+  //     //getting all users list
+  //     eventEmitter.emit("get-all-visitors");
+
+  //     //sending all users list. and setting if online or offline.
+  //     sendVisitorStack = function() {
+  //       for (i in visitorSocket) {
+  //         for (j in visitorStack) {
+  //           if (j == i) {
+  //             visitorStack[j] = "Online";
+  //           }
+  //         }
+  //       }
+  //       //console.log(visitorStack);
+  //       //for popping connection message.
+  //       ioChat.emit("onlineStack", visitorStack);
+
+  //     }; //end of sendUserStack function.
+
+
+  //     eventEmitter.emit("get-all-agents");
+
+  //     //sending all agent list. and setting if online or offline.
+  //     sendAgentStack = function() {
+  //       for (i in agentSocket) {
+  //         for (j in agentStack) {
+  //           if (j == i) {
+  //             agentStack[j] = "Online";
+  //           }
+  //         }
+  //       }
+  //       //for popping connection message.
+  //       ioChat.emit("agentsList", agentStack);    
+  //     }; //end of sendUserStack function.
+
+  //   });
+    
+  //   socket.on("disconnect", function() {
+  //     console.log("newvisitor signup disconnected.");
+  //   });
+  // });
+  //#endregion
 
   //
   //

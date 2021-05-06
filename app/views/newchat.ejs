@@ -2,86 +2,653 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" media="screen" href="/newWidget/assets/css/bootstrap.min.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" media="screen" href="/newWidget/assets/css/bootstrap.min.css">
 
-    <link href="/newWidget/assets/css/font-awesome.css" rel="stylesheet">
+  <link href="/newWidget/assets/css/font-awesome.css" rel="stylesheet">
 
-    <link rel="stylesheet" media="screen" href="/newWidget/assets/css/chatWidget.css">
+  <link rel="stylesheet" media="screen" href="/newWidget/assets/css/chatWidget.css">
 
-    <title>Dino Chat Widget</title>
+  <link href="/emojis/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+
+  <script src="/newWidget/assets/js/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+
+  <script>
+    var visitorHash;
+    
+    FingerprintJS.load().then(fp => {
+      fp.get().then(result => {
+        visitorHash = result.visitorId;
+
+        //#region visitorId
+        function checkCookies()
+        {
+          var cookieEnabled = (navigator.cookieEnabled) ? true : false;
+          if (typeof navigator.cookieEnabled == "undefined" && !cookieEnabled)
+          { 
+              document.cookie="testcookie";
+              cookieEnabled = (document.cookie.indexOf("testcookie") != -1) ? true : false;
+          }
+          return (cookieEnabled);
+        }
+
+        function makeid(length) {
+          var result = '';
+          var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+          var charactersLength = characters.length;
+          for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+          }
+          return result;
+        }
+        
+        var key = '';
+        var randomKey = '';
+
+        if (checkCookies()) {
+            var sessionStorageNum = window.sessionStorage.getItem("sessionStorageNum");
+            key = '';
+            randomKey = makeid(7);
+            console.log(sessionStorage, sessionStorage, 'before session storage');
+
+            if (sessionStorageNum == '' || sessionStorageNum == null) {
+              sessionStorage.setItem("sessionStorageNum", randomKey);
+              key = randomKey;
+            } else {
+              key = sessionStorageNum;
+            }
+            $("#visitor_id").val(key);
+            $("#visitor").val(key);
+          }
+          else {
+
+            window.addEventListener("message", evt => {
+              for (var i = 0; i < evt.data.length; i++) {
+                if (typeof (evt.data[i]) == 'object') {
+                  if ('userData' in evt.data[i] === true) {
+                    //console.log('not assigned', evt.data[i].userData['userId']);
+                    key = evt.data[i].userData['userId'];
+                    document.getElementById("visitor_id").value = key;
+                    document.getElementById("visitor").value = key;
+                  }
+                }
+              }
+            });
+          }
+          //key  = 'i3wxuKO';
+          //console.log('key assigned', key);
+          // $("#visitor_id").val(key);
+          // $("#visitor").val(key);
+          console.log('psl 6',document.getElementById("visitor_id").value);
+        //#endregion  
+        
+        console.log('visitorId -->', visitorHash);
+        console.log('visitorkey -->', key);
+        console.log('result.components.timezone.value -->', result.components.timezone.value);
+
+        console.log(result, 'test', document.referrer.split('/')[2]);
+        console.log('test', document.referrer);
+        $("#visitor_uniqueNum").val(visitorHash);
+        $("#hdnVisitorUniqueNum").val(visitorHash);
+
+        $("#web_path").val(document.referrer);
+        $("#hdnVisitorWebPath").val(document.referrer);
+        
+        var myCurl = window.location.href;
+        // myCurl = myCurl.split('?');
+        // myCurl = myCurl[1].replace(/--/g,'/');
+        // myCurl = myCurl.replace(/v=/g,'');
+        // myCurl = myCurl.replace(/%3A/g,':');
+        console.log(myCurl);
+        myCurl = "https://webjazeera.com/";
+        $("#hdnVisitorCompleteWebPath").val(myCurl);
+
+        
+
+        $("#hdnVisitorHost").val(document.referrer.split('/')[2]);
+        $("#hdnVisitorFP_TimezoneLocation").val(result.components.timezone.value);
+
+        // $("#visitor").val(sessionStorageNum);
+        // $("#visitor_id").val(sessionStorageNum);
+
+        
+      });
+
+    });
+
+
+  </script>
+  
+
+  <style>
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #34db3c;
+      width: 30px;
+      height: 30px;
+      -webkit-animation: spin 2s linear infinite;
+      /* Safari */
+      animation: spin 2s linear infinite;
+      margin: auto;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+
+
+  <title>Dino Chat Widget</title>
 
 </head>
 
 <body>
-    <input type="hidden" id="visitor" value="<%= user.visitor_name %>"/>
-    <input type="hidden" id="visitor_id" value="<%= user.visitor_id %>"/>
+  <input type="hidden" id="visitor" />
+  <input type="hidden" id="visitor_id" />
+  <input type="hidden" id="hdnVisitorUniqueNum" />
+  <input type="hidden" id="hdnVisitorWebPath" />
+  <input type="hidden" id="hdnVisitorCompleteWebPath" />
+  <input type="hidden" id="hdnVisitorHost" />
+  <input type="hidden" id="hdnVisitorFP_TimezoneLocation" />
 
-    <div id="chatframe" class="chatWidgetWrap mainChatWindow">
+  <input type="hidden" id="hdnPublicIpValue" value="<%= publicip %>" />
+  <input type="hidden" id="hdnPrivateIpValue" value="<%= privateip %>" />
+  <input type="hidden" id="hdnGeoLocValue" value="<%= JSON.stringify(geoloc) %>" />
+  <input type="hidden" id="hdnGeoLocValuePrivate" value="<%= JSON.stringify(geolocprivate) %>" />
+  <input type="hidden" id="hdnBrowserAndOSValue" value="<%= JSON.stringify(browserandos) %>" />
+  <input type="hidden" id="web_path" />
+
+  <input type="hidden" id="hdnpmntAgent" />
+  <input type="hidden" id="hdnpmntVisitor" />
+  <input type="hidden" id="hdnpmntAmount" />
+  <input type="hidden" id="hdnpmntChatRoom" />
+
+  <div id="chatframe" class="chatWidgetWrap mainChatWindow">
+    <div class="outerWrapWidget" style="display: none;">
       <div id="frame">
         <div class="chatWidgetHead">
-            <div class="col-md-1 col-sm-1 col-xs-1">
-                <a href="javascript:;" class="backBtnClass dummyBackBtn">
-                    <i class="fa fa-angle-left"></i>
-                </a>
-            </div>
-            <!-- col-md-3 -->
-            <div class="col-md-9 col-sm-9 col-xs-9">
-                <div class="userHeader">
-                    <div class="media">
-                        <div class="media-left">
-                            <span class="onlineStatus online"></span>
-                            <span class="chatUserImg">
-                                <img src="/newWidget/assets/images/user.jpg" class="media-object">
-                            </span>
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Daria Mathew</h4>
-                            <p class="msg">Active</p>
-                        </div>
-                    </div>
+          <!-- <div class="col-md-1 col-sm-1 col-xs-1">
+                      <a href="javascript:;" class="backBtnClass dummyBackBtn">
+                          <i class="fa fa-angle-left"></i>
+                      </a>
+                  </div> -->
+          <!-- col-md-3 -->
+          <div class="col-md-9 col-sm-9 col-xs-9">
+            <div class="userHeader">
+              <div class="media">
+                <div class="media-left">
+                  <span class="onlineStatus online"></span>
+                  <span class="chatUserImg">
+                    <img src="/newWidget/assets/images/agentavatar.jpg" class="media-object">
+                  </span>
                 </div>
-                <!-- #userHeader -->
+                <div class="media-body">
+                  <h4 class="media-heading">Chat Support</h4>
+                  <p class="msg">Active</p>
+                </div>
+              </div>
             </div>
-            <!-- col-md-6 -->
+            <!-- #userHeader -->
+          </div>
+          <!-- col-md-6 -->
+          <div class="col-md-1 col-sm-1 col-xs-1">
+
+          </div>
+          <div class="col-md-1 col-sm-1 col-xs-1">
+            <div class="open-payment" style="display: none;">
+              <a href="javascript:;" class=""><i class="fa fa-money"></i></a>
+            </div>
+          </div>
+
+          <div class="col-md-1 col-sm-1 col-xs-1">
+
+            <div class="open-user_info">
+              <a href="javascript:;" class=""><i class="fa fa-pencil"></i></a>
+            </div>
+          </div>
         </div>
         <!-- #chatWidgetHead -->
 
         <div class="chatWidgetMainChat">
-            <div class="chatComments" id="scrl3">
-                <ul id="messages">
-                    
-                </ul>
-            </div>
-            <!-- #chatComments-->
+          <div class="chatComments" id="scrl3">
+            <ul class="messages" id="messages">
 
-            <div class="submitComment">
-              <form id="visitorchatForm" action="" enctype="multipart/form-data" method="POST" autocomplete="off">
-                <input type="hidden" id="repMsgId" name="repMsgId" >
-                <input type="file" name="file" id="photos-input" />
-                <!-- <textarea class="form-control" id="myMsg" name="myMsg" placeholder="Write a message..."></textarea> -->
-                <input class="form-control"  type="text"  id="myMsg"  name="myMsg" placeholder="Write your message..." />
-                <label class="btn btn-success btn-submitComment photos-input" for="photos-input">
-                    <i class="fa fa-paperclip" aria-hidden="true"></i>
-                </label>
-                <a href="javascript:;" class="btn btn-success smileFace"><i class="fa fa-smile-o"></i></a>
-                <button id="sendBtn" class="submit">send</button>
-              </form>
-            </div>
-            <!-- #submitComment -->
+            </ul>
+          </div>
+          <!-- #chatComments-->
 
+          <div class="submitComment">
+            <form id="visitorchatForm" action="" enctype="multipart/form-data" method="POST" autocomplete="off">
+              <!-- <input type="hidden" id="web_path" name="web_path"/> -->
+              <input type="hidden" id="repMsgId" name="repMsgId">
+
+              <label for="photos-input" class="custom-file-upload uploadname" style="position: absolute;z-index: 999;top: 50px;right: 20px; font-size:12px;border: 1px dashed #ccc;
+                      display: inline-block;">
+              </label>
+              <input type="file" name="file" id="photos-input" />
+
+              <!-- <textarea class="form-control" id="myMsg" name="myMsg" placeholder="Write a message..."></textarea> -->
+              <input class="form-control" type="text" id="myMsg" name="myMsg" placeholder="Write your message..." />
+              <label class="btn btn-success btn-submitComment photos-input" for="photos-input">
+                <i class="fa fa-paperclip" aria-hidden="true"></i>
+              </label>
+
+              <!-- <div class="container">
+                            <input type="text" id="faceText" class="form-control" placeholder="Default">
+                      </div> -->
+              <!-- <label class="btn btn-success smileFace myMsg" for="myMsg">
+                            <i class="fa fa-smile-o" aria-hidden="true"></i>
+                        </label> -->
+
+              <!-- <a href="javascript:;" class="btn btn-success smileFace"><i class="fa fa-smile-o"></i></a> -->
+
+
+              <button id="sendBtn" class="submit">send</button>
+            </form>
+
+          </div>
+          <!-- #submitComment -->
+
+          <div class="chatPaymentForm" style="display:none">
+            <form action="" method="POST" id="payment-form1">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="paymentImgs">
+                    <img src="/newWidget/assets/images/paymenticons.png" alt="-" class="img-responisve" />
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" size="20" maxlength="16" class="form-control" data-stripe="number"
+                      placeholder="Valid Card Number">
+
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-6">
+                  <div class="form-group">
+                    <label> Expiration (MM/YY)</label>
+                    <div class="row">
+                      <div class="col-xs-6" style="padding: 0 0 0 16px;">
+                        <input type="text" size="2" maxlength="2" class="small exp_month form-control"
+                          data-stripe="exp_month" placeholder="MM">
+                      </div>
+                      <div class="col-xs-6" style="padding:0 0 0 14px;">
+                        <input type="text" size="2" maxlength="2" class="small exp_year form-control"
+                          data-stripe="exp_year" placeholder="YY">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-6">
+                  <div class="form-group">
+                    <label>CVC</label>
+                    <input type="text" size="4" maxlength="4" class="small cvcsmall  form-control" data-stripe="cvc"
+                      placeholder="132">
+                    <input type="hidden" name="transactionkey">
+                  </div>
+                </div>
+              </div>
+              <span class="payment-errors" style="color:red;"></span>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="loader" style="display:none"></div>
+                  <input type="submit" class="submit btn--m btn btn-success btn-paymentSubmit" value="Submit Payment">
+                </div>
+              </div>
+            </form>
+          </div>
+          <!-- #chatPaymentForm -->
+          <div class="chatVisitorInfo" style="display:none">
+            <form action="" method="POST" id="visitor-info-form">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="paymentImgs">
+                    <h4>Add/Edit Details</h4>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Full name</label>
+                    <input type="text" class="form-control" name="full_name" placeholder="Full Name">
+
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" class="form-control" name="email" placeholder="Email Address">
+
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" class="form-control" name="phone_number" placeholder="Phone Number">
+
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="loader" style="display:none"></div>
+                  <span class="payment-errors1" style="color:red;"></span>
+                  <input type="submit" class="submit btn--m btn btn-success btn-visitorInfoSubmit" value="Submit Info">
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="chatVisitorError" style="display:none">
+            <div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="paymentImgs">
+                    <h4>Please check your browser setting and allow cookies</h4>
+                  </div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
 
         </div>
         <!-- #chatWidgetMainChat -->
       </div>
     </div>
+  </div>
+
+  <div class="chatOnsiteWidget">
+    <a href="javascript:;">
+      <span class="chatWithUsBox">Chat With Us <img src="/newWidget/assets/images/hand-slow.gif" alt="-" /></span>
+      <span class="chatIcon">
+        <!-- <img src="/newWidget/assets/images/chatwithus.png" onclick="markMsgsRead()" alt="Chat With Us" class="img-responsive" /> -->
+        <img src="/newWidget/assets/images/chatwithus.png" alt="Chat With Us" class="img-responsive" />
+      </span>
+    </a>
+  </div>
+
+  <script>
+    var delayInMilliseconds = 2000; //1 second
+
+    setTimeout(function() {
+      console.log('now set', $("#visitor_id").val());
+      $.ajax({
+          url: '/api/v1/newchat',
+          type: 'post',
+          data: {
+            hash: $('#hdnVisitorUniqueNum').val(),
+            visitor_web_path: $('#hdnVisitorWebPath').val(),
+            visitor_complete_web_path: $('#hdnVisitorCompleteWebPath').val(),
+            visitor_TimezoneLocation: $("#hdnVisitorFP_TimezoneLocation").val(),
+            visitorId: $("#visitor_id").val()
+          },
+          success: function (res) {
+            console.log('asasdasdasd', res);
+            var script = document.createElement('script');
+            script.src = "/js/newvisitorscriptForChat.js";
+            document.getElementsByTagName('body')[0].appendChild(script);
+
+            $(".messages li").sort(function(a, b) {
+              return new Date($(a).find(".dateTime")) > new Date($(b).find(".dateTime"));
+            }).each(function() {
+              $(".messages").prepend(this);
+            });
+            // console.log('texrtbox', $("#visitor_id").val());
+            // // $("#visitor").val(res.visitor_id);
+            // // $("#visitor_id").val(res.visitor_id);
+            // // $("#visitor").val('1wfxXdgof'); 
+            // // $("#visitor_id").val('1wfxXdgof');
+            // console.log('texrtbox 2', $("#visitor_id").val());
+          },
+          error: function (res) {
+            console.log('error',res);
+            if(res.status == 500)
+            {
+              $(".chatVisitorError").show()
+              
+            }
+          }
+        });
+    }, delayInMilliseconds);
+
+    function markMsgsRead(){
+      //alert('asdasd');
+      if ( $(".chatWithUsBox").css('display') != 'none')
+      {
+        alert("The paragraph  is visible.");
+      }
+    };
+
+    
+  </script>
+  <script src="/newWidget/assets/js/jquery.min.js"></script>
+  <script src="/newWidget/assets/js/bootstrap.min.js"></script>
+  <script src="/js/moment.min.js"></script>
+  <script src="/js/socket.io-1.7.3.js" defer></script>
+  <!-- <script src="/js/newvisitorscriptForChat.js" defer></script> -->
+  <!-- <script>
+    var delayInMilliseconds = 7000; //7 second
+
+    setTimeout(function() {
+      // var script = document.createElement('script');
+      // script.src = "/js/socket.io-1.7.3.js";
+      // document.getElementsByTagName('body')[0].appendChild(script);
+
+      var script = document.createElement('script');
+      script.src = "/js/newvisitorscriptForChat.js";
+      document.getElementsByTagName('body')[0].appendChild(script);
+      //$("#chatWidget").show();
+    });
+    
+
+  </script> -->
   
-    <script src="/newWidget/assets/js/jquery.min.js"></script>
-    <script src="/newWidget/assets/js/bootstrap.min.js"></script>
-    <script src="/js/moment.min.js"></script>
-    <script src="/js/socket.io-1.7.3.js"></script>
-    <script src="/js/newvisitorscriptForChat.js"></script>
+
+  <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+  <script type="text/javascript">
+    
+    Stripe.setPublishableKey('pk_test_51IRe6wGfVJkUd1MAD5BardSZV4RZe3pvbdyudwZCwt2rsMjP5ca8ApEoyCY78S9Ig0WYMiHNc5zolpBeJUlnrZye00ElVGylER');
+
+    $(function () {
+      var $form = $('#payment-form1');
+      $form.submit(function (event) {
+        event.preventDefault(); console.log('done');
+        // Disable the submit button to prevent repeated clicks:
+        $form.find('.submit').prop('disabled', true);
+
+        // Request a token from Stripe:
+        Stripe.card.createToken($form, stripeResponseHandler);
+
+        // Prevent the form from being submitted:
+        return false;
+      });
+    });
+
+    $(function () {
+      var $form = $('#visitor-info-form');
+      $form.submit(function (event) {
+        event.preventDefault();
+
+        $form.find('.btn-visitorInfoSubmit').prop('disabled', true);
+
+        $.ajax({
+          url: '/newvisitor/api/v1/updatevisitorinfo',
+          type: "POST",
+          data: {
+            hash: $('#hdnVisitorUniqueNum').val(),
+            username: $('input[name="full_name"]').val(),
+            email: $('input[name="email"]').val(),
+            phone_number: $('input[name="phone_number"]').val()
+          },
+          success: function (res) {
+            console.log('behtareen', res);
+            $('.loader').hide();
+            $('.payment-errors1').text('User Details Updated!');
+            var visitorId = $('#visitor_id').val();
+            var socket = io('/chat');
+            socket.emit('set-user-data',visitorId);
+            setTimeout(function () {
+              $form.find('.btn-visitorInfoSubmit').prop('disabled', false);
+              $('.open-user_info a').toggleClass('active');
+              // $(this).toggleClass("active");
+              $(".chatVisitorInfo").fadeToggle();
+              $('.payment-errors1').text('');
+              //$('.open-user_info').toggleClass('display','none');
+            }, 1500);
+            // $('.btn-paymentSubmit').hide();
+            // $('#loader').show();
+          }
+        });
+      });
+    });
+
+    function stripeResponseHandler(status, response) {
+      // Grab the form:
+      var $form = $('#payment-form1');
+
+      if (response.error) { // Problem!
+
+        // Show the errors on the form:
+        $form.find('.payment-errors').text(response.error.message);
+        $form.find('.submit').prop('disabled', false); // Re-enable submission
+
+      } else { // Token was created!
+
+        // Get the token ID:
+        var token = response.id;
+
+        // Insert the token ID into the form so it gets submitted to the server:
+        $form.append($('<input type="hidden" name="stripeToken">').val(token));
+        $('.btn-paymentSubmit').hide();
+        $('.loader').show();
+        
+        $.ajax({
+          url: '/payment/api/v1/customerPayment',
+          type: "POST",
+          data: {
+            cus_token: token,
+            agentId: $("#hdnpmntAgent").val(),
+            visitorId: $("#hdnpmntVisitor").val(),
+            amount: $("#hdnpmntAmount").val()
+
+          },
+          success: function (res) {
+            console.log('behtareen', res);
+            $('.loader').hide();
+            $('.payment-errors').text('Payment Success! Thankyou');
+            var paymentRespMsg = {msg: "$"+ $("#hdnpmntAmount").val() + " amount has been paid",msgFrom : $("#hdnpmntVisitor").val(),msgTo: $("#hdnpmntAgent").val(),type:"visitor", room: $("#hdnpmntChatRoom").val()};
+            //console.log(paymentRespMsg);
+            var socket = io('/chat');
+            socket.emit('visitor-payment-response',paymentRespMsg);
+            setTimeout(function () {
+
+              $('.open-payment a').toggleClass('active');
+              // $(this).toggleClass("active");
+              $(".chatPaymentForm").fadeToggle();
+              $('.open-payment').css('display', 'none');
+            }, 1500);
+            // $('.btn-paymentSubmit').hide();
+            // $('#loader').show();
+          }
+        })
+        console.log('sumair token ', token);
+        // Submit the form:
+        //$form.get(0).submit();
+      }
+    };
+  </script>
+
+  <script type="text/javascript" src="/emojis/js/jquery.emojiFace.js"></script>
+  <script src="/newWidget/assets/js/iframeResizer.contentWindow.min.js"></script>
+  <script type="text/javascript">
+    $("#web_path").val(document.referrer);
+    $(function () {
+
+      $('#myMsg').emojiInit({
+        fontSize: 20,
+        success: function (data) {
+
+        },
+        error: function (data, msg) {
+        }
+      });
+    });
+
+
+
+    //Show File name  which uploaded
+    $('#photos-input').change(function () {
+      var i = $(this).prev('label.uploadname').clone();
+      var file = $('#photos-input')[0].files[0].name;
+      $(this).prev('label.uploadname').text(file);
+    });
+  </script>
+
+
+
+  <!-- endregion emojis-->
 </body>
+
+<script>
+  $(".chatOnsiteWidget").click(function () {
+    $(".outerWrapWidget").fadeToggle('slow');
+    setTimeout(function () {
+      $(".chatWithUsBox").fadeToggle('fast');
+    }, 800);
+
+  });
+
+
+
+  $(".chatOnsiteWidget").hide();
+  setTimeout(function () {
+    $(".chatOnsiteWidget").fadeIn();
+
+  }, 500);
+
+
+
+  $(".open-payment a").click(function () {
+    $(".chatVisitorInfo").fadeOut();
+    $('.open-user_info a').removeClass('active');
+    $(this).toggleClass("active");
+    $(".chatPaymentForm").fadeToggle();
+  });
+  $(".open-user_info a").click(function () {
+    $(".chatPaymentForm").fadeOut();
+    $('.open-payment a').removeClass('active');
+    $(this).toggleClass("active");
+    $(".chatVisitorInfo").fadeToggle();
+  });
+
+</script>
 
 </html>

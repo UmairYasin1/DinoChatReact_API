@@ -9,10 +9,19 @@ const path = require("path");
 const fs = require("fs");
 const logger = require("morgan");
 var cors = require('cors');
+// const helmet = require('helmet');
 //const socketio = require("socket.io");
+var Fingerprint = require('express-fingerprint')
+//const httpsLocalhost = require("https-localhost")()
+//const certs = httpsLocalhost.getCerts()
 
+// const options = {
+//   key: fs.readFileSync('localhost.key'),
+//   cert: fs.readFileSync('localhost.crt')
+// }
 
 const app = express();
+//const http = require("https").createServer(options, app);
 const http = require("http").Server(app);
 //io = socketio.listen(http);
 
@@ -35,10 +44,36 @@ app.use(useragent.express());
 app.use(cors());
 app.use(cookieParser());
 
+// app.use(helmet.frameguard({ action: "sameorigin" }));
+
+// app.use(Fingerprint({
+//   parameters:[
+//       // Defaults
+//       Fingerprint.useragent,
+//       Fingerprint.acceptHeaders,
+//       Fingerprint.geoip,
+
+//       // Additional parameters
+//       function(next) {
+//           // ...do something...
+//           next(null,{
+//           'param1':'value1'
+//           })
+//       },
+//       function(next) {
+//           // ...do something...
+//           next(null,{
+//           'param2':'value2'
+//           })
+//       },
+//   ]
+// }));
+
 //db connection
 //const dbPath = "mongodb://localhost/socketChatDB";
 //const dbPath = "mongodb://localhost:27017/DinoChatTest";
 // const dbPath = "mongodb://umairyasin:03333088323@dinochatcluster-shard-00-00-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-01-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-02-dtwkz.mongodb.net:27017/DinoChatTest?replicaSet=DinoChatCluster-shard-0&ssl=true&authSource=admin";
+//const dbPath = "mongodb://localhost:27017/DinoChat";
 const dbPath = "mongodb://umairyasin:03333088323@dinochatcluster-shard-00-00-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-01-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-02-dtwkz.mongodb.net:27017/DinoChatTest2?replicaSet=DinoChatCluster-shard-0&ssl=true&authSource=admin";
 //const dbPath = `mongodb://github_demo:Pass\#12@ds149511.mlab.com:49511/socketionodejschat`;
 mongoose.connect(dbPath, { useNewUrlParser: true });
@@ -84,11 +119,14 @@ app.use(
 const sessionInit = session({
   name: "userCookie",
   secret: "9743-980-270",
-  resave: true,
+  //resave: true,
+  resave: false,
   httpOnly: true,
   saveUninitialized: true,
+  path: '/',
   store: new mongoStore({ mongooseConnection: mongoose.connection }),
-  cookie: { maxAge: 80 * 80 * 800 }
+  // cookie: { maxAge: 80 * 80 * 800, secure: true }
+  cookie: { maxAge: 1800000, secure: true } //1800000 = 30 min, 120000 = 2min
 });
 
 app.use(sessionInit);
@@ -153,6 +191,25 @@ app.use(function(req, res, next) {
     next();
   }
 }); //end of set Logged In User.
+
+// // const server = http.createServer((req, res) => {
+// //   res.writeHead(200, { 'content-type': 'text/html' })
+// //   fs.createReadStream('chatindex.html').pipe(res)
+// // });
+
+// const server = http.createServer(app).listen(port, function(req, res) {
+//   res.writeHead(200, { 'content-type': 'text/html' })
+//   fs.createReadStream('chatindex.html').pipe(res)
+// });
+
+// var http2 = require('http');
+
+// const server2 = http2.createServer((req, res) => {
+//   //res.writeHead(200, { 'content-type': 'text/html' })
+//   fs.createReadStream('chatindex.html').pipe(res)
+// });
+
+// server2.listen(process.env.PORT || 8080);
 
 
 http.listen(port, function() {

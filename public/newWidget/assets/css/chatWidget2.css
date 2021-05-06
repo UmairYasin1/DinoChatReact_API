@@ -1,0 +1,137 @@
+body::-webkit-scrollbar-track{background-color:#F5F5F5}
+body::-webkit-scrollbar{width:8px;background-color:#F5F5F5}
+body::-webkit-scrollbar-thumb{background-color:#ccc}
+
+
+.chatWidgetWrap {}
+
+.chatWidgetHead {min-height: 70px;border-radius: 0px;background-image: linear-gradient(to bottom, #5676e3 -1%, #2e49b2 98%);position: fixed;width: 100%;z-index: 999;}
+
+.chatWidgetHead .backBtnClass {color: #fff;font-size: 35px;margin: 9px auto 0 auto;display: block;width: 15px;}
+
+
+.chatWidgetMainChat {
+    padding: 70px 0 70px 0;
+}
+.chatWidgetMainChat .chatComments::-webkit-scrollbar-track{	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);	background-color: #F5F5F5;}
+.chatWidgetMainChat .chatComments::-webkit-scrollbar{	width: 5px;	background-color: #F5F5F5;}
+.chatWidgetMainChat .chatComments::-webkit-scrollbar-thumb{background-color: #7a40f2;	border: 0px solid #555555;}
+
+
+
+.chatWidgetMainChat .submitComment{position:relative;overflow:hidden;height: 80px;border-top:1px solid #ccc;position: fixed;bottom: 0;width: 100%;z-index: 999;background: #fff;}
+.chatWidgetMainChat .submitComment .form-control{position:absolute;top: 5px;border:none;box-shadow:none;height: 70px;resize: none;padding: 10px 60px 10px 10px;}
+.chatWidgetMainChat .submitComment .btn.btn-submitComment{position:absolute;top: 10px;right: 10px;background: transparent;border-radius:90px;height:50px;width:50px;border:none;padding:9px 0 0;font-size:21px;color: #4d4d4f;}
+.chatWidgetMainChat .submitComment .smileFace {color: #6b5e69;font-size: 20px;position: absolute;top: 14px;right: 50px;z-index: 9;background: transparent;border: none;}
+
+
+.chatWidgetMainChat .chatComments ul {list-style: none; padding: 0;}
+.chatWidgetMainChat .chatComments ul li{display: block;clear: both;margin: 20px 0 20px 0;overflow: hidden;position: relative;}
+.chatWidgetMainChat .chatComments ul li .userImgAndChat{}
+.chatWidgetMainChat .chatComments ul li .userImgAndChat .userImg{width: 36px;height: 36px;display: inline-block;overflow: hidden;border-radius: 50px;float: right;vertical-align: bottom;position: absolute;bottom: 24px;right: 0;}
+.chatWidgetMainChat .chatComments ul li .userImgAndChat .userImg img {}
+.chatWidgetMainChat .chatComments ul li .userImgAndChat .userChat {padding: 20px 20px 10px 20px;background-color: #5676e3;display: inline-block;width: 60%;-webkit-border-radius: 15px;-webkit-border-bottom-right-radius: 0;-moz-border-radius: 15px;-moz-border-radius-bottomright: 0;border-radius: 15px;border-bottom-right-radius: 0;float: right;margin: 0 50px 0 0;} 
+.chatWidgetMainChat .chatComments ul li .userImgAndChat .userChat p {color: #fff; font-size: 14px;}
+
+.chatWidgetMainChat .chatComments ul li .userImgAndChat  .dateTime {font-size: 12px;color: #4d4d4f;float: right;display: block;clear: both;margin: 10px 47px 0  0;}
+
+
+
+.chatWidgetMainChat .chatComments ul li.OtherUser .userImgAndChat .userImg{float: left;right: auto;bottom: auto;}
+.chatWidgetMainChat .chatComments ul li.OtherUser .userImgAndChat .userChat {float: left;margin: 0 0px 0 44px;background-color: #5676e3;-webkit-border-radius: 15px;-webkit-border-top-left-radius: 0;-moz-border-radius: 15px;-moz-border-radius-topleft: 0;border-radius: 15px;border-top-left-radius: 0;} 
+.chatWidgetMainChat .chatComments ul li.OtherUser .userImgAndChat .userChat p {color: #fff;}
+.chatWidgetMainChat .chatComments ul li.OtherUser .userImgAndChat  .dateTime {float: left;margin: 10px 0 0 47px;}
+
+
+
+.chatWidgetHead .userHeader {margin: 10px 0}
+
+.chatWidgetHead .userHeader .chatUserImg {overflow: hidden;height: 50px;width: 50px;border-radius: 50%;display: block;position: relative;margin: 0 0 0 0;border: 2px solid #fff;}
+.chatWidgetHead .userHeader .chatUserImg img {width: 50px;margin: 0 auto;}
+.chatWidgetHead .userHeader .media-left {position: relative;}
+.chatWidgetHead .userHeader .media-left .onlineStatus {width: 12px;height: 12px;border: solid 2px #ffffff;background: #b1b1b1;display: block;border-radius: 50%;position: absolute;z-index: 99;right: 12px;bottom: 2px;}
+.chatWidgetHead .userHeader  .media-left .onlineStatus.online{background: #8bc442;}
+.chatWidgetHead .userHeader .media-heading {font-size: 16px;font-weight: 700;color: #fff;margin: 10px 0 0 10px;}
+.chatWidgetHead .userHeader  p.msg{font-size: 12px;color: rgba(255, 255, 255, 0.46);width: 200px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;margin: 0 0 0 10px;}
+.chatWidgetHead .userHeader .media-left  {margin: 0 40px 0 0 }
+
+
+
+
+
+
+
+/*  Second Widget   */
+
+
+.ChatStartWidgetWrap {}
+.ChatStartWidgetWrap .ChatStartWidgetHead{border-radius: 2px;  background-image: linear-gradient(to bottom, #5676e3 -1%, #2e49b2 98%); min-height: 277px;}
+
+.ChatStartWidgetWrap .ChatStartWidgetHead .ChatHeaderSettings  {padding: 30px 50px;}
+.ChatStartWidgetWrap .ChatStartWidgetHead .ChatHeaderSettings .logoClass {display: block;max-width: 50px;margin: 0 0 0 0;}
+.ChatStartWidgetWrap .ChatStartWidgetHead .ChatHeaderSettings  .WelcomeMsgTxt {
+}
+.ChatStartWidgetWrap .ChatStartWidgetHead .ChatHeaderSettings  .WelcomeMsgTxt h3{font-size: 35px;color: #ffffff;}
+.ChatStartWidgetWrap .ChatStartWidgetHead .ChatHeaderSettings  .WelcomeMsgTxt h3 img {    max-width: 40px; display: inline-block;  width: 100%;}
+.ChatStartWidgetWrap .ChatStartWidgetHead .ChatHeaderSettings  .WelcomeMsgTxt p{font-size: 14px;color: rgba(255, 255, 255, 0.63);}
+
+
+.ChatBodyStart {margin: -60px 5% 0 5%;}
+.ChatBodyStart .BoxWhite {padding: 20px 20px 30px 20px;background: #fff;box-shadow: 0px 0px 8px #e0dfdf;border-top: 4px solid #5676e3;clear: both;margin: 0 0 20px 0;}
+.ChatBodyStart .BoxWhite h3 {font-size: 16px;font-weight: 600;color: #262626;margin: 20px 0 20px 0;}
+
+
+
+
+.ChatBodyStart .BoxWhite .userHeader .chatUserImg {overflow: hidden;height: 50px;width: 50px;border-radius: 50%;display: block;position: relative;margin: 0 0 0 0;border: 2px solid #fff;}
+.ChatBodyStart .BoxWhite .userHeader .chatUserImg img {width: 50px;margin: 0 auto;}
+.ChatBodyStart .BoxWhite .userHeader .media-left {position: relative;}
+.ChatBodyStart .BoxWhite .userHeader .media-left .onlineStatus {width: 12px;height: 12px;border: solid 2px #ffffff;background: #b1b1b1;display: block;border-radius: 50%;position: absolute;z-index: 99;right: 12px;bottom: 2px;}
+
+.ChatBodyStart .BoxWhite .userHeader .media-left ul {list-style: none;padding: 0;width: 62px;}
+.ChatBodyStart .BoxWhite .userHeader .media-left ul li{display: inline-block;position: absolute;left: 0px;}
+.ChatBodyStart .BoxWhite .userHeader .media-left ul li+li {left: 10px}
+.ChatBodyStart .BoxWhite .userHeader .media-left ul li+li+li {left: 20px}
+
+
+
+.ChatBodyStart .BoxWhite .userHeader  .media-left .onlineStatus.online{background: #8bc442;}
+.ChatBodyStart .BoxWhite .userHeader .media-heading {font-size: 14px;font-weight: 600;color: #4d4d4f;margin: 10px 0 3px 10px;}
+.ChatBodyStart .BoxWhite .userHeader  p.msg{color: #000;width: 100%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;margin: 0 0 0 10px;font-size: 15px;font-weight: 600;max-width: 260px;}
+.ChatBodyStart .BoxWhite .userHeader  p.msg i {color: #2741aa;}
+.ChatBodyStart .BoxWhite .userHeader .media-left  {margin: 0 40px 0 0 }
+
+.ChatBodyStart .BoxWhite .btn-sendMsg { margin: 20px 0 0 0;  border: 1px solid #2741aa; border-radius: 0px; color: #2741aa;  padding: 10px 40px; font-weight: 700;}
+.ChatBodyStart .BoxWhite .btn-sendMsg:hover {background: #2741aa; color: #fff;}
+
+.ChatBodyStart .BoxWhite .btn-startChat {margin: 20px 0 0 0;border: 1px solid #2741aa;border-radius: 0px;color: #2741aa;padding: 10px 40px;font-weight: 700;width: 100%;font-size: 16px; background: #2741aa; color: #fff;}
+.ChatBodyStart .BoxWhite .btn-startChat:hover {background: #2741aa; color: #fff;}
+
+
+.chatInfoForm {}
+.chatInfoForm .form-control {border-radius: 0;box-shadow: none;padding: 20px 10px;}
+
+
+
+
+
+
+
+
+
+
+.chatImages img {
+    width: 100%;
+    max-width: 150px;
+}
+#photos-input, #sendBtn {display: none!important;}
+
+
+
+
+
+
+
+
+
+

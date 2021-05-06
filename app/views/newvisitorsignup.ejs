@@ -1,159 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" media="screen" href="/newWidget/assets/css/bootstrap.min.css">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" media="screen" href="/newWidget/assets/css/bootstrap.min.css">
+    
+        <link href="/newWidget/assets/css/font-awesome.css" rel="stylesheet">
+    
+        <link rel="stylesheet" media="screen" href="/newWidget/assets/css/chatWidget.css">
+        <script src="/newWidget/assets/js/jquery.min.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
 
-    <link href="/newWidget/assets/css/font-awesome.css" rel="stylesheet">
+        <script>
+            var visitorId;
+            FingerprintJS.load().then(fp => {
+                    // The FingerprintJS agent is ready.
+                    // Get a visitor identifier when you'd like to.
+                    fp.get().then(result => {
+                    // This is the visitor identifier:
+                        visitorId = result.visitorId;
+                        console.log(visitorId,'test',document.referrer.split('/')[2]);
+                        console.log('test',document.referrer);
+                        $("#visitor_uniqueNum").val(visitorId);
+                        $("#hdnVisitorUniqueNum").val(visitorId);
 
-    <link rel="stylesheet" media="screen" href="/newWidget/assets/css/chatWidget.css">
+                        $("#web_path").val(document.referrer);
+                        $("#hdnVisitorWebPath").val(document.referrer);
+                        // $("#web_path").val('http://webjazeera.com/lp/new-lp/');
+                        // $("#hdnVisitorWebPath").val('http://webjazeera.com/lp/new-lp/');
 
-    <title>Dino Chat Widget</title>
+                        $("#hdnVisitorHost").val(document.referrer.split('/')[2]);
+                        $("#hdnVisitorFP_TimezoneLocation").val(result.components.timezone.value);
 
-</head>
+                        // $("#hdnVisitorHost").val('http://webjazeera.com/');
+                        // $("#hdnVisitorFP_TimezoneLocation").val('http://webjazeera.com/');
 
-<body>
+                        // var visitor_uniqueNumVal = $('#hdnVisitorUniqueNum').val();
+                        // var visitor_web_path = $('#hdnVisitorWebPath').val();
+                        // var visitor_host = $('#hdnVisitorHost').val();
+                        // var visitor_TimezoneLocation = $('#hdnVisitorFP_TimezoneLocation').val();
+                        // var visitor_PublicIpValue = $('#hdnPublicIpValue').val();
+                        // var visitor_PrivateIpValue = $('#hdnPrivateIpValue').val();
 
-    <div class="ChatStartWidgetWrap enterUserData" style="display: none;">
-        <div class="ChatStartWidgetHead">
+                        // var visitor_GeoLocValue = $('#hdnGeoLocValue').val();
+                        // var visitor_GeoLocValuePrivate = $('#hdnGeoLocValuePrivate').val();
+                        // var visitor_BrowserAndOSValue = $('#hdnBrowserAndOSValue').val();
 
-            <div class="ChatHeaderSettings">
-                <div class="Logo">
-                    <a href="javascript:;" class="logoClass">
-                        <img src="/newWidget/assets/images/chatNewLogo.png" class="img-responsive" />
-                    </a>
-                </div>
-                <!-- #Logo-->
-                <div class="WelcomeMsgTxt">
-                    <h3>HI <img src="/newWidget/assets/images/wavehand.png" alt="-" /></h3>
-                    <p>We help your business grow by connecting you to your customers.</p>
-                </div>
-                <!-- #WelcomeMsgTxt-->
-            </div>
-            <!-- #ChatHeaderSettings -->
-        </div>
-        <!-- #ChatStartWidgetHead -->
+                        // console.log('@@@@',$("#hdnPublicIpValue").val());
+                        // console.log('@@@@',$("#hdbPrivateIpValue").val());
+                        // console.log('@@@@',$("#hdnGeoLocValue").val());
+                        // console.log('@@@@',$("#hdbGeoLocValuePrivate").val());
+                        // console.log('@@@@',$("#hdnBrowserAndOSValue").val());
+                        // console.log(visitorId);
+                        // var hash  = visitorId;
+                        $.ajax({
+                            url: '/newvisitor/api/v1/signup',
+                            type:'post',
+                            //target="iframe",
+                            data:{
+                                hash: $('#hdnVisitorUniqueNum').val(),
+                                visitor_web_path :  $('#hdnVisitorWebPath').val(),
+                                visitor_TimezoneLocation : $('#hdnVisitorFP_TimezoneLocation').val()
+                                // visitor_name: $('#hdnVisitorUniqueNum').val(),
+                                // visitor_email:$('#hdnVisitorUniqueNum').val(),
+                                // phone_number: $('#hdnVisitorUniqueNum').val(),
+                            },
+                            success:function(res){
+                                //console.log(res);
+                                console.log('asasdasdasd',res);
+                                //location.reload();
+                                // window.location.href = '/newchat?data=' + res;
+                                //location.href = '/newchat?data=' + res;
+                                $.ajax({
+                                    url: '/newchat',
+                                    type:'post',
+                                    //contentType: "application/x-www-form-urlencoded",
+                                    //dataType:'json',
+                                    //contentType: "application/json",
+                                    data: { visitor_name :  '123', visitor_id: '123' },
+                                    jsonpCallback: 'callback',
+                                    //dataType: "json",
+                                    success:function(res){
+                                        console.log('asasdasdasd 2',res);
+                                    }
+                                })
+                            },
+                            xhrFields:{
+                                withCredentials:true
+                            }
+                        });
+                    });
+                });
+                
+                //var aaaa = "<%= browserandos %>";
+                //var initData = JSON.parse('<%= JSON.stringify(browserandos) %>');
+                // var initData = '<%=JSON.stringify(browserandos)%>';
+                // console.log("ejs", initData);
+        </script>
+        <title>Dino Chat Widget</title>
+    
+    </head>
+    
+    <body>
+        <input type="hidden" id="visitor"/>
+        <input type="hidden" id="visitor_id"/>
 
-        <div class="ChatBodyStart">
+        <input type="hidden" id="hdnVisitorUniqueNum"/>
+        <input type="hidden" id="hdnVisitorWebPath"/>
+        <input type="hidden" id="hdnVisitorHost"/>
+        <input type="hidden" id="hdnVisitorFP_TimezoneLocation"/>
 
-          <form class="signup-form" action="/newvisitor/api/v1/signup" method="post">
-            <div class="BoxWhite">
-                <h3>Enter your details</h3>
-                <div class="clearfix"></div>
+        <input type="hidden" id="hdnPublicIpValue" value="<%= publicip %>"/>
+        <input type="hidden" id="hdnPrivateIpValue" value="<%= privateip %>"/>
+        <input type="hidden" id="hdnGeoLocValue" value="<%= JSON.stringify(geoloc) %>"/>
+        <input type="hidden" id="hdnGeoLocValuePrivate" value="<%= JSON.stringify(geolocprivate) %>"/>
+        <input type="hidden" id="hdnBrowserAndOSValue" value="<%= JSON.stringify(browserandos) %>"/>
 
-                <div class="chatInfoForm">
-                    <div class="form-group">
-                        <label>Username</label>
-                        <input id="visitor_name" class="form-control" type="text" name="visitor_name" placeholder="Username" autocomplete="off" required/>
-                    </div>
-                    <!-- #form-group -->
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input id="visitor_email" class="form-control" type="email" name="visitor_email" placeholder="Email" autocomplete="off" required/>
-                    </div>
-                    <!-- #form-group -->
+        <div class="outerWrapWidget" style="display: none;">
 
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input id="phone_number" class="form-control" type="text" name="phone_number" placeholder="Phone Number" required/>
-                    </div>
-                    <!-- #form-group -->
-
-                </div>
-
-
-                <div class="clearfix"></div>
-
-                <!-- <a href="javascript:;" class="btn  btn-startChat dummyStartChat"><i class="fa fa-comments"></i> Start Chat</a> -->
-                <button class="btn  btn-startChat dummyStartChat" type="submit" name="submit">Chat Now</button><br>
-
-            </div>
-            <!-- #BoxWhite -->
-          </form>
-        </div>
-        <!-- #ChatBodyStart -->
-
-
-
-
-
-
-    </div>
-    <!-- #ChatStartWidget -->
-
-    <div class="ChatStartWidgetWrap startChatScreen">
-        <div class="ChatStartWidgetHead">
-
-            <div class="ChatHeaderSettings">
-                <div class="Logo">
-                    <a href="javascript:;" class="logoClass">
-                        <img src="/newWidget/assets/images/chatNewLogo.png" class="img-responsive" />
-                    </a>
-                </div>
-                <!-- #Logo-->
-                <div class="WelcomeMsgTxt">
-                    <h3>HI <img src="/newWidget/assets/images/wavehand.png" alt="-" /></h3>
-                    <p>We help your business grow by connecting you to your customers.</p>
-                </div>
-                <!-- #WelcomeMsgTxt-->
-            </div>
-            <!-- #ChatHeaderSettings -->
-        </div>
-        <!-- #ChatStartWidgetHead -->
-
-        <div class="ChatBodyStart">
-            <!-- #BoxWhite -->
-            <div class="BoxWhite">
-                <h3>Start a conversation</h3>
-                <div class="clearfix"></div>
-
-                <div class="userHeader">
-                    <div class="media">
-                        <div class="media-left">
-                            <ul>
-                                <li><span class="chatUserImg multi">
-                                        <img src="/newWidget/assets/images/user.jpg" class="media-object">
-                                    </span>
-                                </li>
-                                <li><span class="chatUserImg multi">
-                                        <img src="/newWidget/assets/images/userImg.jpg" class="media-object">
-                                    </span>
-                                </li>
-                                <li><span class="chatUserImg multi">
-                                        <img src="/newWidget/assets/images/uiface.jpg" class="media-object">
-                                    </span>
-                                </li>
-                            </ul>
+            <!-- <div class="ChatStartWidgetWrap startChatScreen">
+                <div class="ChatStartWidgetHead">
+        
+                    <div class="ChatHeaderSettings">
+                        <div class="Logo">
+                            <a href="javascript:;" class="logoClass">
+                                <img src="/newWidget/assets/images/chatNewLogo.png" class="img-responsive" />
+                            </a>
                         </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Our usual reply time</h4>
-                            <p class="msg"><i class="fa fa-clock-o"></i> A few minutes</p>
+                        <div class="WelcomeMsgTxt">
+                            <h3>HI <img src="/newWidget/assets/images/wavehand.png" alt="-" /></h3>
+                            <p>We help your business grow by connecting you to your customers.</p>
                         </div>
                     </div>
                 </div>
-                <div class="clearfix"></div>
-                <a href="javascript:;" class="btn  btn-sendMsg dummySendMsg"><i class="fa fa-send"></i> Send us a message</a>
+              
+                <div class="ChatBodyStart">
+                    <div class="BoxWhite">
+                        <h3>Start a conversation</h3>
+                        <div class="clearfix"></div>
+        
+                        <div class="userHeader">
+                            <div class="media">
+                                <div class="media-left">
+                                    <ul>
+                                        <li><span class="chatUserImg multi">
+                                                <img src="/newWidget/assets/images/user.jpg" class="media-object">
+                                            </span>
+                                        </li>
+                                        <li><span class="chatUserImg multi">
+                                                <img src="/newWidget/assets/images/userImg.jpg" class="media-object">
+                                            </span>
+                                        </li>
+                                        <li><span class="chatUserImg multi">
+                                                <img src="/newWidget/assets/images/uiface.jpg" class="media-object">
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="media-body">
+                                    <h4 class="media-heading">Our usual reply time</h4>
+                                    <p class="msg"><i class="fa fa-clock-o"></i> A few minutes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <a href="javascript:;" class="btn  btn-sendMsg dummySendMsg"><i class="fa fa-send"></i> Send us a message</a>
+                    </div>
+        
+                </div>
+            </div> -->
+
+            <div class="ChatStartWidgetWrap enterUserData">
+                <div class="ChatStartWidgetHead">
+        
+                    <div class="ChatHeaderSettings">
+                        <div class="Logo">
+                            <a href="javascript:;" class="logoClass">
+                                <img src="/newWidget/assets/images/chatNewLogo.png" class="img-responsive" />
+                            </a>
+                        </div>
+                        <!-- #Logo-->
+                        <div class="WelcomeMsgTxt">
+                            <h3>HI <img src="/newWidget/assets/images/wavehand.png" alt="-" /></h3>
+                            <p>We help your business grow by connecting you to your customers.</p>
+                        </div>
+                        <!-- #WelcomeMsgTxt-->
+                    </div>
+                    <!-- #ChatHeaderSettings -->
+                </div>
+                <!-- #ChatStartWidgetHead -->
+        
+                <div class="ChatBodyStart">
+        
+                  <form class="signup-form" action="/newvisitor/api/v1/signup" method="post">
+                    <div class="BoxWhite">
+                        <h3>Enter your details</h3>
+                        <div class="clearfix"></div>
+    
+                        <!-- <input type="hidden" id="pathVal" value="" + window.parent.location.href/> -->
+    
+                        <div class="chatInfoForm">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input id="visitor_name" class="form-control" type="text" name="visitor_name" placeholder="Username" autocomplete="off" required/>
+                            </div>
+                            <!-- #form-group -->
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input id="visitor_email" class="form-control" type="email" name="visitor_email" placeholder="Email" autocomplete="off" required/>
+                            </div>
+                            <!-- #form-group -->
+        
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input id="phone_number" class="form-control" type="text" name="phone_number" placeholder="Phone Number" required/>
+                            </div>
+                            <!-- #form-group -->
+    
+                            <div class="form-group" style="display: none;">
+                                <label>web_path</label>
+                                <input id="web_path" class="form-control" type="text" name="web_path"/>
+                            </div>
+                            <div class="form-group" style="display: none;">
+                                <label>visitor_uniqueNum</label>
+                                <input id="visitor_uniqueNum" class="form-control" type="text" name="visitor_uniqueNum"/>
+                            </div>
+                            <!-- #form-group -->
+        
+                        </div>
+    
+                        <div class="clearfix"></div>
+        
+                        <!-- <a href="javascript:;" class="btn  btn-startChat dummyStartChat"><i class="fa fa-comments"></i> Start Chat</a> -->
+                        <button class="btn  btn-startChat dummyStartChat" type="submit" name="submit">Chat Now</button><br>
+        
+                    </div>
+                    <!-- #BoxWhite -->
+                  </form>
+                </div>
+                <!-- #ChatBodyStart -->
+        
+        
             </div>
-            <!-- #BoxWhite -->
-
+            <!-- #ChatStartWidget -->
+    
         </div>
-        <!-- #ChatBodyStart -->
-    </div>
+    
+        <div class="chatOnsiteWidget">
+            <a href="javascript:;">
+               <span class="chatWithUsBox">Chat With Us <img src="/newWidget/assets/images/hand-slow.gif" alt="-" /></span>
+               <span class="chatIcon">
+                <img src="/newWidget/assets/images/chatwithus.png" alt="Chat With Us" class="img-responsive" />
+                </span>
+            </a>
+        </div>
+        
+    
 
-    <script src="/newWidget/assets/js/jquery.min.js"></script>
-    <script src="/newWidget/assets/js/bootstrap.min.js"></script>
+        <script src="/newWidget/assets/js/bootstrap.min.js"></script>
+        <script src="/js/socket.io-1.7.3.js"></script>
+        <!-- <script src="/newWidget/assets/js/iframeResizer.min.js"></script> -->
+        <script src="/newWidget/assets/js/iframeResizer.contentWindow.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $(".dummySendMsg").click(function () {
+                    $(".ChatStartWidgetWrap").hide();
+                    $(".enterUserData").show();
+                });
 
-    <script>
-        $(document).ready(function () {
-            $(".dummySendMsg").click(function () {
-                $(".ChatStartWidgetWrap").hide();
-                $(".enterUserData").show();
-            });
-        });
-    </script>
-    <!-- <script src="/js/visitorscript.js"></script> -->
-</body>
+                // $(".chatOnsiteWidget").click(function(){
+                //     $(".limitWidget").toggle();
+                // });
 
+                $(".chatOnsiteWidget").click(function(){
+                    $(".outerWrapWidget").fadeToggle('slow');
+                    $(".chatWithUsBox").fadeToggle('fast');
+                
+                });
+                
+                //$("#visitor_uniqueNum").val('visitorId');
+                // var url = (window.location != window.parent.location)
+                // ? document.referrer
+                // : document.location.href;
+                // console.log('url',url);
+                // console.log('window.location',window.location);
+                // console.log('window.parent.location',window.parent.location);
+                // console.log('document.referrer',document.referrer);
+                // console.log('document.location.href',document.location.href);
+        
+                // console.log('window.parent.location.href',window.parent.location.href);
+           });
+        </script>
+
+        <!-- <script>
+                function initFingerprintJS() {
+                    FingerprintJS.load().then(fp => {
+                        // The FingerprintJS agent is ready.
+                        // Get a visitor identifier when you'd like to.
+                        fp.get().then(result => {
+                        // This is the visitor identifier:
+                            const visitorId = result.visitorId;
+
+                            $("#visitor_uniqueNum").val(visitorId);
+                            $("#hdnVisitorUniqueNum").val(visitorId);
+                            console.log(result);
+                        });
+                    });
+                }
+        </script> -->
+
+        <!-- <script
+            async
+            src="//cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"
+            onload="initFingerprintJS()"
+        ></script> -->
+        <!-- <script src="/js/visitorscript.js"></script> -->
+        <!-- <script src="/js/newvisitorscriptForSignup.js"></script> -->
+        
+    </body>
+    
 </html>
+

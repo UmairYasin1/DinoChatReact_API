@@ -80,7 +80,6 @@ module.exports.controller = function(app) {
 
   //api to create new user
    router.post("/api/v1/signup", function(req, res) {
-
      const today = Date.now();
      const id = shortid.generate();
 
@@ -116,6 +115,7 @@ module.exports.controller = function(app) {
         });
 
       } else {
+        console.log('result ==', result);
          req.user = result;
          req.session.user = result;
          req.session.save();
