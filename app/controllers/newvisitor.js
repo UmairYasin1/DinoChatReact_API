@@ -216,6 +216,7 @@ module.exports.controller = function(app) {
                         completePath: visitorURL,
                         createdOn: pathDate
                       });
+                      console.log('atif 1');
                       newVisitorPath.save(function(err, result) {
                         if (result == null || result == undefined || result == "") {
                           newVisitorPath.save();
@@ -242,6 +243,7 @@ module.exports.controller = function(app) {
               completePath: visitorURL,
               createdOn: pathDate
             });
+            console.log('atif 2');
             newVisitorPath.save(function(err, result) {
               if (result == null || result == undefined || result == "") {
                 newVisitorPath.save();
@@ -529,6 +531,7 @@ module.exports.controller = function(app) {
             completePath: visitorURL,
             createdOn: pathDate
           });
+          console.log('atif 3');
           newVisitorPath.save();
         }
                   

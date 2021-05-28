@@ -9,6 +9,7 @@ const visitorSchema = new Schema({
   payment_link: { type: String, default: "" },
   brand_id: { type: String, default: "" },
   brand_name: { type: String, default: "" },
+  brand_teamId: { type: String, default: "" },
   company_name: { type: String, default: "" },
   number_of_employees: { type: String, default: "" },
   web_path: { type: String, default: "" },

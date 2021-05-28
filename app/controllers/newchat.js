@@ -84,9 +84,7 @@ module.exports.controller = function(app) {
   //api to create new user
   app.post("/api/v1/newchat", function(req, res) 
   {
-    //console.log('umaiz');
-    //console.log('data ajao',req.body);
-
+    
    var visitorURL = "";
    var visitorHASH = req.body.hash;
    var visitorNewID = req.body.visitorId;
@@ -94,10 +92,6 @@ module.exports.controller = function(app) {
    var visitorHost = "";
    var visitorCompleteWebPath = "";
    
-  //  console.log(req.body.hash);
-  //  console.log(req.body.visitor_web_path);
-  // console.log(req.body.visitor_TimezoneLocation);
-  // console.log('visitorNewID',visitorNewID);
 
    if(req.body.visitor_web_path != null || req.body.visitor_web_path != undefined || req.body.visitor_web_path != "")
    {
@@ -111,38 +105,45 @@ module.exports.controller = function(app) {
    {
      visitorHost = req.headers.host;
    }
-  //  console.log('visitorHASH  --- ',visitorHASH);
+  
     console.log('visitorURL  --- ',visitorURL);
     console.log('visitorHost  --- ',visitorHost);
     console.log('visitorCompleteWebPath  --- ',visitorCompleteWebPath);
-  //  console.log('visitorTZ_Loc  --- ',visitorTZ_Loc);
-  //  console.log('visitorNewID  --- ',visitorNewID);
-    
-   visitorModel.findOne(
-    { $and: [{ visitor_uniqueNum: visitorHASH, visitor_id: visitorNewID }] },
-    function(err, result) {
-      if (err) {
+  
+    var pattern=/(.+:\/\/)?([^\/]+)(\/.*)*/i;
+    var url=visitorURL;
+    var arr=pattern.exec(url);
+    //let regexUrl =  new RegExp('^'+visitorURL+'$', "i");
+    var brand_urlVal = "";
+    if(arr != null && arr != undefined && arr != "")
+    {
+      brand_urlVal = arr[2];
+    }
+
+    brandModel.findOne(
+    { "brand_url": { $regex: '.*' + brand_urlVal + '.*', $options: '$i' } },
+    function(errBrand, resultBrand) 
+    {
+      if (errBrand) {
         res.status(500).json({
           success: false,
           message: "Some Error Occured"
-        });
-
-      } else if (result == null || result == undefined || result == "") {
-
-        // res.status(404).json({
-        //   success: false,
-        //   message: "User Not Found."
-        // });
-
-        //visitorURL = 'webjazeera';
-        brandModel.findOne(
-          { brand_url: { $regex: '.*' + visitorURL + '.*' } },
-          function(err, resultBrand) {
-            if (resultBrand != null || resultBrand != undefined || resultBrand != "") 
-            {
-              console.log("brand name",resultBrand.brand_name);
+        })
+      }
+      else if (resultBrand !== null && resultBrand !== undefined && resultBrand !== "")
+      {
+        visitorModel.findOne(
+          { $and: [{ visitor_uniqueNum: visitorHASH, visitor_id: visitorNewID, brand_id: resultBrand.brand_id }] },
+          function(err, result) {
+            if (err) {
+              res.status(500).json({
+                success: false,
+                message: "Some Error Occured"
+              });
+      
+            } else if (result == null || result == undefined || result == "") {
+      
               const todayDate = Date.now();
-              //const id = shortid.generate();
               var No_Of_Visits_Val = 1;
               const newVisitor = new visitorModel({
                 visitor_id: visitorNewID,
@@ -153,6 +154,7 @@ module.exports.controller = function(app) {
                 web_path: visitorURL,
                 brand_id : resultBrand.brand_id,
                 brand_name : resultBrand.brand_name,
+                brand_teamId: resultBrand.brand_teamId,
                 visitor_publicIp: publicIpValue,
                 visitor_privateIp: privateIpValue,
                 visitor_region_publicIp: geoLocValue,
@@ -182,29 +184,7 @@ module.exports.controller = function(app) {
                 } 
                 else 
                 {
-                  // var No_Of_Visits_Val = result.no_of_visits + 1;
-                  // console.log(No_Of_Visits_Val);
-                  // visitorModel.update({visitor_uniqueNum: visitorHASH }, 
-                  //   {
-                  //     "$set":
-                  //     {
-                  //       no_of_visits: parseInt(No_Of_Visits_Val)
-                  //     }
-                  //   }, function(err, result) {
-                  //     if (err) {
-                  //       console.log('00000000');
-                
-                  //     } else if (result == null || result == undefined || result == "") {
-                
-                  //       console.log('111111111');
-                
-                  //     } 
-                  //     else 
-                  //     {
-                  //       console.log('222222222');
-                  //     }
-                  //   });
-                  //console.log('solve');
+                  
                   if(visitorCompleteWebPath != null || visitorCompleteWebPath != undefined || visitorCompleteWebPath != "")
                   {
                     const pathDate = Date.now();
@@ -216,85 +196,165 @@ module.exports.controller = function(app) {
                       visitor_email: resultNewVisSave.visitor_email,
                       visitor_uniqueNum: resultNewVisSave.visitor_uniqueNum,
                       completePath: visitorCompleteWebPath,
+                      brand_id: resultNewVisSave.brand_id,
+                      brand_teamId: resultNewVisSave.brand_teamId,
                       createdOn: pathDate
                     });
+                    //console.log('aslam 1');
                     newVisitorPath.save();
                   }
 
                   console.log('!!! new visitor');
-                  req.user = result;
-                  req.session.user = result;
+                  req.user = resultNewVisSave;
+                  req.session.user = resultNewVisSave;
                   req.session.save();
                   //res.redirect("/newchat");
-                  res.send(result);
+                  res.send(resultNewVisSave);
                   //return result;
                 }
               });
-            }
-          });
-
-      } 
-      else 
+      
+            } 
+            else 
+            {
+      
+              visitorModel.countDocuments({visitor_uniqueNum: visitorHASH, brand_id: resultBrand.brand_id }, function(err, countResult) {
+                console.log(countResult);
+                visitorModel.update({ visitor_uniqueNum: visitorHASH, visitor_id: visitorNewID, brand_id: resultBrand.brand_id }, 
+                  {
+                    "$set":
+                    {
+                      no_of_visits: parseInt(countResult)
+                    }
+                  }, function(err, result) {
+                    if (err) {
+                      console.log('00000000');
+              
+                    } else if (result == null || result == undefined || result == "") {
+              
+                      console.log('111111111');
+              
+                    } 
+                    else 
+                    {
+                      console.log('222222222');
+                    }
+                  });
+      
+                console.log('solve');
+      
+                if(visitorCompleteWebPath != null || visitorCompleteWebPath != undefined || visitorCompleteWebPath != "")
+                {
+                  const pathDate = Date.now();
+                  const pathShortId = shortid.generate();
+                  const newVisitorPath = new visitorpathModel({
+                    path_id: pathShortId,
+                    visitor_id: result.visitor_id,
+                    visitor_name: result.visitor_name,
+                    visitor_email: result.visitor_email,
+                    visitor_uniqueNum: result.visitor_uniqueNum,
+                    completePath: visitorCompleteWebPath,
+                    brand_id: result.brand_id,
+                    brand_teamId: result.brand_teamId,
+                    createdOn: pathDate
+                  });
+                  //console.log('aslam 3');
+                  newVisitorPath.save();
+                }
+              });
+                        
+              console.log('!!! old visitor', result.visitor_id);
+              req.user = result;
+              req.session.user = result;
+              req.session.save();
+              res.send(result);
+              
+             }
+        });
+      }
+      else
       {
 
-        visitorModel.countDocuments({visitor_uniqueNum: visitorHASH }, function(err, countResult) {
-          //var No_Of_Visits_Val = result.no_of_visits + 1;
-          console.log(countResult);
-          visitorModel.update({ visitor_uniqueNum: visitorHASH, visitor_id: visitorNewID }, 
-            {
-              "$set":
-              {
-                no_of_visits: parseInt(countResult)
-              }
-            }, function(err, result) {
-              if (err) {
-                console.log('00000000');
-        
-              } else if (result == null || result == undefined || result == "") {
-        
-                console.log('111111111');
-        
-              } 
-              else 
-              {
-                console.log('222222222');
-              }
-            });
+        res.status(200).json({
+          success: true,
+          message: "Not found",
+          IsBrandFound: false
+        })
+      }
+      // else
+      // {
+      //   const todayDate = Date.now();
+      //   //const id = shortid.generate();
+      //   var No_Of_Visits_Val = 1;
+      //   const newVisitor = new visitorModel({
+      //     visitor_id: visitorNewID,
+      //     visitor_name: "WC_" + visitorNewID,
+      //     visitor_email: "walkingcustomer_" + visitorNewID + "@dc.com",
+      //     visitor_uniqueNum: visitorHASH,
+      //     phone_number: "000",
+      //     web_path: visitorURL,
+      //     brand_id : "",
+      //     brand_name : "",
+      //     brand_teamId : "",
+      //     visitor_publicIp: publicIpValue,
+      //     visitor_privateIp: privateIpValue,
+      //     visitor_region_publicIp: geoLocValue,
+      //     visitor_region_privateIp: geoLocValuePrivate,
+      //     visitor_browser_and_os: browserAndOSValue,
+      //     visitor_TimezoneLocation: visitorTZ_Loc,
+      //     no_of_visits : No_Of_Visits_Val,
+      //     createdOn: todayDate,
+      //     updatedOn: todayDate
+      //   });
+      
+      //   newVisitor.save(function(err, resultNewVisSave) {
+      //     if (err) {
+      //       console.log('error 1');
+      //       res.status(500).json({
+      //         success: false,
+      //         message: "Some Error Occured"
+      //       });
+      
+      //     } else if (resultNewVisSave == null || resultNewVisSave == undefined || resultNewVisSave == "") {
+      //       console.log('error 2');
+      //       res.status(404).json({
+      //         success: false,
+      //         message: "Data Not Found"
+      //       });
+      
+      //     } 
+      //     else 
+      //     {
+            
+      //       if(visitorCompleteWebPath != null || visitorCompleteWebPath != undefined || visitorCompleteWebPath != "")
+      //       {
+      //         const pathDate = Date.now();
+      //         const pathShortId = shortid.generate();
+      //         const newVisitorPath = new visitorpathModel({
+      //           path_id: pathShortId,
+      //           visitor_id: resultNewVisSave.visitor_id,
+      //           visitor_name: resultNewVisSave.visitor_name,
+      //           visitor_email: resultNewVisSave.visitor_email,
+      //           visitor_uniqueNum: resultNewVisSave.visitor_uniqueNum,
+      //           completePath: visitorCompleteWebPath,
+      //           brand_id: resultNewVisSave.brand_id,
+      //           brand_teamId: resultNewVisSave.brand_teamId,
+      //           createdOn: pathDate
+      //         });
+      //         //console.log('aslam 2');
+      //         newVisitorPath.save();
+      //       }
 
-          console.log('solve');
-
-          if(visitorCompleteWebPath != null || visitorCompleteWebPath != undefined || visitorCompleteWebPath != "")
-          {
-            const pathDate = Date.now();
-            const pathShortId = shortid.generate();
-            const newVisitorPath = new visitorpathModel({
-              path_id: pathShortId,
-              visitor_id: result.visitor_id,
-              visitor_name: result.visitor_name,
-              visitor_email: result.visitor_email,
-              visitor_uniqueNum: result.visitor_uniqueNum,
-              completePath: visitorCompleteWebPath,
-              createdOn: pathDate
-            });
-            newVisitorPath.save();
-          }
-        });
-                  
-        console.log('!!! old visitor', result.visitor_id);
-        //globalVisitorId = result.visitor_id;
-        req.user = result;
-        req.session.user = result;
-        req.session.save();
-        //console.log(req.session.user);
-        //return Json(output, JsonRequestBehavior.AllowGet);
-        res.send(result);
-        //res.redirect("/newchat");
-        // res.status(200).json({
-        //   success: true,
-        //   visitor: req.session.user
-        // });
-       }
+      //       console.log('!!! new visitor');
+      //       req.user = resultNewVisSave;
+      //       req.session.user = resultNewVisSave;
+      //       req.session.save();
+      //       res.send(resultNewVisSave);
+      //     }
+      //   });
+      // }
     });
+
  });
 
 
@@ -453,6 +513,7 @@ module.exports.controller = function(app) {
                         completePath: visitorURL,
                         createdOn: pathDate
                       });
+                      console.log('aslam 4');
                       newVisitorPath.save();
                     }
   
@@ -509,6 +570,7 @@ module.exports.controller = function(app) {
               completePath: visitorURL,
               createdOn: pathDate
             });
+            console.log('aslam 5');
             newVisitorPath.save();
           }
                     

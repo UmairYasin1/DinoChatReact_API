@@ -200,7 +200,7 @@ $ (function(){
     $.ajax({
       type: "POST",
       //url: "http://localhost:5002/upload/file",
-      url: "http://10.1.30.146:5001/upload/file",
+      url: "http://173.254.252.226:5001/upload/file",
       //url: "https://umairyasin1-dinochat.glitch.me/upload/file",
       // url: "https://dinochat.glitch.me/upload/file",
       //url: "https://dinochat.netlify.app/upload/file",

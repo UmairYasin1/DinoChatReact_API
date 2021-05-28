@@ -8,6 +8,7 @@ const agentSchema = new Schema({
   agent_password: { type: String, default: "", required: true },
   agent_status: { type: String, default: "" },
   agent_ip: { type: String, default: "" },
+  agent_teamId: { type: String, default: "" },
   createdOn: { type: Date, default: Date.now },
   updatedOn: { type: Date, default: Date.now }
 });

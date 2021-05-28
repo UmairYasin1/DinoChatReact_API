@@ -101,6 +101,7 @@ module.exports.controller = function(app) {
         agent_email: req.body.agent_email,
         agent_phone: req.body.phone_number,
         agent_password: epass,
+        agent_teamId: req.body.agent_teamId,
         agent_status: '1',
         agent_ip: today,
         createdOn: today,
@@ -144,6 +145,60 @@ module.exports.controller = function(app) {
       success: true,
       user: req.session.user,
       chat: req.session.chat
+    });
+  });
+
+  router.get("/getAllAgents", function(req, res) 
+  {
+    agentModel.find({}, function(err, data) {
+      if (err) 
+      {
+          res.status(500).json({
+            success: false,
+            message: "Some Error Occured In Agents"
+          });  
+      } 
+      else if (data == null || data == undefined || data == "") 
+      {
+          res.status(404).json({
+            success: false,
+            message: "Agents Not Found"
+          });
+      } 
+      else 
+      {
+          res.status(200).json({
+            success: true,
+            agentList: data
+          });
+      }
+    });
+  });
+
+  router.get("/getTeamAgents", function(req, res) 
+  {
+    agentModel.find({ $and: [{ agent_teamId: req.body.team_Id }] }, function(err, data) {
+      if (err) 
+      {
+          res.status(500).json({
+            success: false,
+            message: "Some Error Occured In Agents"
+          });  
+      } 
+      else if (data == null || data == undefined || data == "") 
+      {
+          res.status(404).json({
+            success: false,
+            message: "Agents Not Found"
+          });
+      } 
+      else 
+      {
+          res.status(200).json({
+            success: true,
+            agentList: data
+          });
+      }
     });
   });
 

@@ -4,6 +4,8 @@ $ (function(){
 
     var visitorname = $('#visitor').val();
     var visitorId = $('#visitor_id').val();
+    var brand_idVal = $('#brand_id').val();
+    var brand_teamIdVal = $('#brand_teamId').val();
 
     console.log('check user name', visitorname);
     console.log('check user id', visitorId);
@@ -21,7 +23,7 @@ $ (function(){
 
   var currentRoom = visitorId;
   var reverseRoom = "";
-  socket.emit('set-room',{name1:currentRoom,name2:reverseRoom});
+  socket.emit('set-room',{name1:currentRoom,name2:reverseRoom, brand_id: brand_idVal, brand_teamId: brand_teamIdVal});
 
    //event for setting roomId.
    socket.on('set-room',function(room){
@@ -53,6 +55,18 @@ $ (function(){
 
     $('.open-payment').show();
 
+  });
+
+  socket.on('open-visitor-chatwidget',function(room){
+    
+    if($('.outerWrapWidget').css('display') == 'none')
+    {
+        $(".outerWrapWidget").fadeToggle('slow');
+        $(".messages").animate({ scrollTop: $('.messages').prop("scrollHeight") }, "fast");
+        setTimeout(function () {
+          $(".chatWithUsBox").fadeToggle('fast');
+        }, 800);
+    }
   });
 
   socket.on('send-visitor-payment-paid-msg',function(data){
@@ -273,7 +287,7 @@ $ (function(){
     $.ajax({
       type: "POST",
       //url: "http://localhost:5002/upload/file",
-      url: "http://10.1.30.146:5001/upload/file",
+      url: "http://173.254.252.226:5001/upload/file",
       //url: "https://umairyasin1-dinochat.glitch.me/upload/file",
       // url: "https://dinochat.glitch.me/upload/file",
       //url: "https://dinochat.netlify.app/upload/file",

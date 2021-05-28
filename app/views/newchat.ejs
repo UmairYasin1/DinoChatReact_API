@@ -23,69 +23,74 @@
         visitorHash = result.visitorId;
 
         //#region visitorId
-        function checkCookies()
-        {
-          var cookieEnabled = (navigator.cookieEnabled) ? true : false;
-          if (typeof navigator.cookieEnabled == "undefined" && !cookieEnabled)
-          { 
-              document.cookie="testcookie";
-              cookieEnabled = (document.cookie.indexOf("testcookie") != -1) ? true : false;
-          }
-          return (cookieEnabled);
-        }
 
-        function makeid(length) {
-          var result = '';
-          var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-          var charactersLength = characters.length;
-          for (var i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-          }
-          return result;
-        }
+        // function checkCookies()
+        // {
+        //   var cookieEnabled = (navigator.cookieEnabled) ? true : false;
+        //   if (typeof navigator.cookieEnabled == "undefined" && !cookieEnabled)
+        //   { 
+        //       document.cookie="testcookie";
+        //       cookieEnabled = (document.cookie.indexOf("testcookie") != -1) ? true : false;
+        //   }
+        //   return (cookieEnabled);
+        // }
+
+        // function makeid(length) {
+        //   var result = '';
+        //   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        //   var charactersLength = characters.length;
+        //   for (var i = 0; i < length; i++) {
+        //     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        //   }
+        //   return result;
+        // }
         
-        var key = '';
-        var randomKey = '';
+        // var key = '';
+        // var randomKey = '';
 
-        if (checkCookies()) {
-            var sessionStorageNum = window.sessionStorage.getItem("sessionStorageNum");
-            key = '';
-            randomKey = makeid(7);
-            console.log(sessionStorage, sessionStorage, 'before session storage');
+        // if (checkCookies()) {
+        //     var sessionStorageNum = window.sessionStorage.getItem("sessionStorageNum");
+        //     key = '';
+        //     randomKey = makeid(7);
+        //     console.log(sessionStorage, sessionStorage, 'before session storage');
 
-            if (sessionStorageNum == '' || sessionStorageNum == null) {
-              sessionStorage.setItem("sessionStorageNum", randomKey);
-              key = randomKey;
-            } else {
-              key = sessionStorageNum;
-            }
-            $("#visitor_id").val(key);
-            $("#visitor").val(key);
-          }
-          else {
+        //     if (sessionStorageNum == '' || sessionStorageNum == null) {
+        //       sessionStorage.setItem("sessionStorageNum", randomKey);
+        //       key = randomKey;
+        //     } else {
+        //       key = sessionStorageNum;
+        //     }
+        //     $("#visitor_id").val(key);
+        //     $("#visitor").val(key);
+        //   }
+        //   else {
 
-            window.addEventListener("message", evt => {
-              for (var i = 0; i < evt.data.length; i++) {
-                if (typeof (evt.data[i]) == 'object') {
-                  if ('userData' in evt.data[i] === true) {
-                    //console.log('not assigned', evt.data[i].userData['userId']);
-                    key = evt.data[i].userData['userId'];
-                    document.getElementById("visitor_id").value = key;
-                    document.getElementById("visitor").value = key;
-                  }
-                }
-              }
-            });
-          }
-          //key  = 'i3wxuKO';
-          //console.log('key assigned', key);
-          // $("#visitor_id").val(key);
-          // $("#visitor").val(key);
-          console.log('psl 6',document.getElementById("visitor_id").value);
+        //     window.addEventListener("message", evt => {
+        //       for (var i = 0; i < evt.data.length; i++) {
+        //         if (typeof (evt.data[i]) == 'object') {
+        //           if ('userData' in evt.data[i] === true) {
+        //             //console.log('not assigned', evt.data[i].userData['userId']);
+        //             key = evt.data[i].userData['userId'];
+        //             document.getElementById("visitor_id").value = key;
+        //             document.getElementById("visitor").value = key;
+        //           }
+        //         }
+        //       }
+        //     });
+        //   }
+        //   //key  = 'i3wxuKO';
+        //   //console.log('key assigned', key);
+        //   // $("#visitor_id").val(key);
+        //   // $("#visitor").val(key);
+        //   console.log('psl 6',document.getElementById("visitor_id").value);
+
+        $("#visitor_id").val(visitorHash);
+        $("#visitor").val(visitorHash);
+
         //#endregion  
         
         console.log('visitorId -->', visitorHash);
-        console.log('visitorkey -->', key);
+        //console.log('visitorkey -->', key);
         console.log('result.components.timezone.value -->', result.components.timezone.value);
 
         console.log(result, 'test', document.referrer.split('/')[2]);
@@ -97,20 +102,13 @@
         $("#hdnVisitorWebPath").val(document.referrer);
         
         var myCurl = window.location.href;
-<<<<<<< HEAD
-        // myCurl = myCurl.split('?');
-        // myCurl = myCurl[1].replace(/--/g,'/');
-        // myCurl = myCurl.replace(/v=/g,'');
-        // myCurl = myCurl.replace(/%3A/g,':');
-        console.log(myCurl);
-        myCurl = "https://webjazeera.com/";
-=======
         myCurl = myCurl.split('?');
         myCurl = myCurl[1].replace(/--/g,'/');
         myCurl = myCurl.replace(/v=/g,'');
         myCurl = myCurl.replace(/%3A/g,':');
+        
         console.log(myCurl);
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
+        //myCurl = "https://webjazeera.com/";
         $("#hdnVisitorCompleteWebPath").val(myCurl);
 
         
@@ -173,6 +171,8 @@
 <body>
   <input type="hidden" id="visitor" />
   <input type="hidden" id="visitor_id" />
+  <input type="hidden" id="brand_id" />
+  <input type="hidden" id="brand_teamId" />
   <input type="hidden" id="hdnVisitorUniqueNum" />
   <input type="hidden" id="hdnVisitorWebPath" />
   <input type="hidden" id="hdnVisitorCompleteWebPath" />
@@ -228,7 +228,7 @@
             </div>
           </div>
 
-          <div class="col-md-1 col-sm-1 col-xs-1">
+          <div class="">
 
             <div class="open-user_info">
               <a href="javascript:;" class=""><i class="fa fa-pencil"></i></a>
@@ -396,12 +396,8 @@
     <a href="javascript:;">
       <span class="chatWithUsBox">Chat With Us <img src="/newWidget/assets/images/hand-slow.gif" alt="-" /></span>
       <span class="chatIcon">
-<<<<<<< HEAD
         <!-- <img src="/newWidget/assets/images/chatwithus.png" onclick="markMsgsRead()" alt="Chat With Us" class="img-responsive" /> -->
         <img src="/newWidget/assets/images/chatwithus.png" alt="Chat With Us" class="img-responsive" />
-=======
-        <img src="/newWidget/assets/images/chatwithus.png" onclick="markMsgsRead()" alt="Chat With Us" class="img-responsive" />
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
       </span>
     </a>
   </div>
@@ -422,22 +418,40 @@
             visitorId: $("#visitor_id").val()
           },
           success: function (res) {
-            console.log('asasdasdasd', res);
-            var script = document.createElement('script');
-            script.src = "/js/newvisitorscriptForChat.js";
-            document.getElementsByTagName('body')[0].appendChild(script);
+            console.log('asasdasdasd q13213123', res);
+            console.log('asasdasdasd q13213123', res.IsBrandFound);
+            if(res == undefined || res.length == 0 || res == null)
+            {
+              location.reload(); 
+            }
+            else if(res.IsBrandFound == false)
+            {
+              location.reload(); 
+            }
+            else
+            {
+              console.log('asasdasdasd', res);
+              console.log('321321321', res.brand_id);
+              $('#brand_id').val(res.brand_id);
+              $('#brand_teamId').val(res.brand_teamId);
+              
+              var script = document.createElement('script');
+              script.src = "/js/newvisitorscriptForChat.js";
+              document.getElementsByTagName('body')[0].appendChild(script);
 
-            $(".messages li").sort(function(a, b) {
-              return new Date($(a).find(".dateTime")) > new Date($(b).find(".dateTime"));
-            }).each(function() {
-              $(".messages").prepend(this);
-            });
-            // console.log('texrtbox', $("#visitor_id").val());
-            // // $("#visitor").val(res.visitor_id);
-            // // $("#visitor_id").val(res.visitor_id);
-            // // $("#visitor").val('1wfxXdgof'); 
-            // // $("#visitor_id").val('1wfxXdgof');
-            // console.log('texrtbox 2', $("#visitor_id").val());
+              $(".messages li").sort(function(a, b) {
+                return new Date($(a).find(".dateTime")) > new Date($(b).find(".dateTime"));
+              }).each(function() {
+                $(".messages").prepend(this);
+              });
+              // console.log('texrtbox', $("#visitor_id").val());
+              // // $("#visitor").val(res.visitor_id);
+              // // $("#visitor_id").val(res.visitor_id);
+              // // $("#visitor").val('1wfxXdgof'); 
+              // // $("#visitor_id").val('1wfxXdgof');
+              // console.log('texrtbox 2', $("#visitor_id").val());
+            }
+            
           },
           error: function (res) {
             console.log('error',res);
@@ -449,6 +463,7 @@
           }
         });
     }, delayInMilliseconds);
+
 
     function markMsgsRead(){
       //alert('asdasd');
@@ -637,7 +652,6 @@
     }, 800);
 
   });
-
 
 
   $(".chatOnsiteWidget").hide();

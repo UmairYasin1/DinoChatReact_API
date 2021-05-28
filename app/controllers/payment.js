@@ -24,7 +24,7 @@ module.exports.controller = function(app) {
         amount: pkgAmountVal,
         currency: 'usd',
         source: req.body.cus_token,
-        description: 'Web Jazeera | DinoChat'
+        description: 'Payment | DinoChat'
     }, (err, charge) => {
         if(err) {
            console.log(err);
@@ -37,7 +37,7 @@ module.exports.controller = function(app) {
             agent_Id: req.body.agentId,
             amount: pkgAmountVal,
             source: req.body.cus_token,
-            description: 'Web Jazeera | DinoChat',
+            description: 'Payment | DinoChat',
             status: charge.status,
             receipt_url: charge.receipt_url,
             createdOn: today

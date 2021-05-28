@@ -6,6 +6,8 @@ const visitorpathSchema = new Schema({
   visitor_name: { type: String, default: "" },
   visitor_email: { type: String, default: "" },
   visitor_uniqueNum: { type: String, default: "" },
+  brand_id: { type: String, default: "" },
+  brand_teamId: { type: String, default: "" },
   completePath : { type: String, default: "" },
   createdOn: { type: Date, default: Date.now },
   updatedOn: { type: Date, default: Date.now }

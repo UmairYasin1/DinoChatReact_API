@@ -43,7 +43,7 @@ function showFaceBlock() {
 }
 function insertAtCaret(c, d, b) {
 	try {
-		$("#faceBlock").hide();
+		$("#faceBlock").show();
 		var a = $("#" + c).get(0);
 		if (document.all && a.createTextRange && a.caretPos) {
 			var e = a.caretPos;

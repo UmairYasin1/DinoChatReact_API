@@ -15,6 +15,7 @@ require("../app/models/visitor.js");
 require("../app/models/brand.js");
 require("../app/models/visitorpath.js");
 require("../app/models/package.js");
+require("../app/models/team.js");
 
 //using mongoose Schema models
 const userModel = mongoose.model("User");
@@ -25,6 +26,7 @@ const visitorModel = mongoose.model("visitor");
 const brandModel = mongoose.model("Brand");
 const visitorpathModel = mongoose.model("visitorPath");
 const packageModel = mongoose.model("Package");
+const teamModel = mongoose.model("Team");
 
 //reatime magic begins here
 module.exports.sockets = function(http) {
@@ -123,17 +125,57 @@ module.exports.sockets = function(http) {
 
   
 
-  socket.on("get_visitor_id", function(obj, callback) {
+  socket.on("get_visitor_id", function(obj, callback) 
+  {
     var visitId = obj.visitorId;
     var agentId = obj.agentId;
+    var agentTeamId = obj.agent_teamId;
     var unReadMsgCountVal = 0;
     // console.log('visitId --1',visitId);
     // console.log('agentId --1',agentId);
+    // console.log('agentTeamId --1',agentTeamId);
+
     visitorModel.findOne(
            { $and: [{ visitor_id: visitId }] },
-           function(err, result) {
-            
-            //#region getting values
+           function(err, result) 
+           {
+
+            if(err)
+            {
+              visit_name =  "";
+              agent_name = "";
+
+              // response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+              //   country: countryVal,
+              //   browser: browserVal,
+              //   os: osVal,
+              //   platform: platformVal,
+              //   ipaddress : ipAddressVal,
+              //   totalhournumber : totalHoursVal,
+              //   totaltimeshort : totalTimeShortVal,
+              //   totaltimelong : totalTimeExpVal,
+              //   createdate : createdDateVal,
+              //   createdOn : result.createdOn,
+              //   payment_link : result.payment_link,
+              //   brand_name : result.brand_name,
+              //   brand_id : result.brand_id,
+              //   phone_number : result.phone_number,
+              //   visitor_email : result.visitor_email,
+              //   visitor_uniqueNum : result.visitor_uniqueNum,
+              //   timezone_location : timezoneLocationVal,
+              //   no_of_visits : result.no_of_visits,
+              //   web_path: result.web_path,
+              //   unReadMsgCount : unReadMsgCountVal
+              // }
+              response = {}
+
+              callback(response);
+            }
+
+            if(result!=null)
+            {
+
+              //#region getting values
 
             //console.log(result.visitor_region_privateIp.length || result.visitor_region_privateIp);
             
@@ -146,7 +188,8 @@ module.exports.sockets = function(http) {
             // var totalTimeShortVal2 = "-";
             // var totalTimeExpVal2 = "-";
             // var createdDateVal2 = "-";
-
+            //console.log('result new user', result);
+            //console.log('result new user created date', result.createdOn);
             var totalHoursVal2 = ( function() {
               date2 = result.createdOn;
               var then = moment(date2, "YYYY-MM-DD'T'HH:mm:ss:SSSZ");
@@ -285,45 +328,7 @@ module.exports.sockets = function(http) {
              var timezoneLocationVal = timezoneLocationVal2;
 
             //#endregion
-            
 
-            if(err)
-            {
-              visit_name =  "";
-              agent_name = "";
-
-              response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                country: countryVal,
-                browser: browserVal,
-                os: osVal,
-                platform: platformVal,
-                ipaddress : ipAddressVal,
-                totalhournumber : totalHoursVal,
-                totaltimeshort : totalTimeShortVal,
-                totaltimelong : totalTimeExpVal,
-                createdate : createdDateVal,
-                createdOn : result.createdOn,
-                payment_link : result.payment_link,
-                brand_name : result.brand_name,
-                brand_id : result.brand_id,
-                phone_number : result.phone_number,
-                visitor_email : result.visitor_email,
-                visitor_uniqueNum : result.visitor_uniqueNum,
-                timezone_location : timezoneLocationVal,
-                no_of_visits : result.no_of_visits,
-<<<<<<< HEAD
-                web_path: result.web_path,
-                unReadMsgCount : unReadMsgCountVal
-=======
-                web_path: result.web_path
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
-              }
-
-              callback(response);
-            }
-
-            if(result!=null)
-            {
              var  visit_name = result.visitor_name;
 
              if(visit_name == "")
@@ -352,12 +357,8 @@ module.exports.sockets = function(http) {
                 visitor_uniqueNum : result.visitor_uniqueNum,
                 timezone_location : timezoneLocationVal,
                 no_of_visits : result.no_of_visits,
-<<<<<<< HEAD
                 web_path: result.web_path,
                 unReadMsgCount : unReadMsgCountVal
-=======
-                web_path: result.web_path
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
               }
 
               callback(response); 
@@ -374,7 +375,8 @@ module.exports.sockets = function(http) {
                           {
                             $or: 
                             [
-                              { name1 : visitId, name2 : agentId }, 
+                              //{ name1 : visitId, name2 : agentId }, 
+                              { name1 : visitId, brand_teamId : agentTeamId }, 
                               { name1 : visitId, name2 : '' },
                               { name1 : visitId, name2 : 'tFAE3OWtP' },
                             ]
@@ -388,32 +390,29 @@ module.exports.sockets = function(http) {
                   {
                     visit_name =  visit_name;
                     agent_name = "";
-                    response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal,
-                      createdOn : result.createdOn,
-                      payment_link : result.payment_link,
-                      brand_name : result.brand_name,
-                      brand_id : result.brand_id,
-                      phone_number : result.phone_number,
-                      visitor_email : result.visitor_email,
-                      visitor_uniqueNum : result.visitor_uniqueNum,
-                      timezone_location : timezoneLocationVal,
-                      no_of_visits : result.no_of_visits,
-<<<<<<< HEAD
-                      web_path: result.web_path,
-                      unReadMsgCount : unReadMsgCountVal
-=======
-                      web_path: result.web_path
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
-                    }
+                    // response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                    //   country: countryVal,
+                    //   browser: browserVal,
+                    //   os: osVal,
+                    //   platform: platformVal,
+                    //   ipaddress : ipAddressVal,
+                    //   totalhournumber : totalHoursVal,
+                    //   totaltimeshort : totalTimeShortVal,
+                    //   totaltimelong : totalTimeExpVal,
+                    //   createdate : createdDateVal,
+                    //   createdOn : result.createdOn,
+                    //   payment_link : result.payment_link,
+                    //   brand_name : result.brand_name,
+                    //   brand_id : result.brand_id,
+                    //   phone_number : result.phone_number,
+                    //   visitor_email : result.visitor_email,
+                    //   visitor_uniqueNum : result.visitor_uniqueNum,
+                    //   timezone_location : timezoneLocationVal,
+                    //   no_of_visits : result.no_of_visits,
+                    //   web_path: result.web_path,
+                    //   unReadMsgCount : unReadMsgCountVal
+                    // }
+                    response = {}
 
                       callback(response);
                   }
@@ -423,69 +422,65 @@ module.exports.sockets = function(http) {
                     //console.log('resppp check 1!!!');
                   if(res.name2 == "")
                   {
-<<<<<<< HEAD
-                    console.log('resppp check 2!!!');
+                    //console.log('resppp check 2!!!');
                     chatModel.countDocuments({ $and: [{ msgFrom: visitId, isRead: false }] }, function (err, count) {
                       
                       unReadMsgCountVal = count;
-                      console.log('there are %d jungle adventures', unReadMsgCountVal);
+                      //console.log('there are %d jungle adventures', unReadMsgCountVal);
 
-                      console.log('--33333--', unReadMsgCountVal, visitId);
+                      //console.log('--33333--');
                       //console.log('2 else', res.name2);
                       visit_name =  visit_name;
                       //agent_name = "";
-                      agent_name = "ChatBot";
-                      response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                        country: countryVal,
-                        browser: browserVal,
-                        os: osVal,
-                        platform: platformVal,
-                        ipaddress : ipAddressVal,
-                        totalhournumber : totalHoursVal,
-                        totaltimeshort : totalTimeShortVal,
-                        totaltimelong : totalTimeExpVal,
-                        createdate : createdDateVal,
-                        createdOn : result.createdOn,
-                        payment_link : result.payment_link,
-                        brand_name : result.brand_name,
-                        brand_id : result.brand_id,
-                        phone_number : result.phone_number,
-                        visitor_email : result.visitor_email,
-                        visitor_uniqueNum : result.visitor_uniqueNum,
-                        timezone_location : timezoneLocationVal,
-                        no_of_visits : result.no_of_visits,
-                        web_path: result.web_path,
-                        unReadMsgCount : unReadMsgCountVal
+                      agent_name = "Unassigned";
 
-                      }
-=======
-                    //console.log('2 else', res.name2);
-                    visit_name =  visit_name;
-                    agent_name = "";
-                    response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal,
-                      createdOn : result.createdOn,
-                      payment_link : result.payment_link,
-                      brand_name : result.brand_name,
-                      brand_id : result.brand_id,
-                      phone_number : result.phone_number,
-                      visitor_email : result.visitor_email,
-                      visitor_uniqueNum : result.visitor_uniqueNum,
-                      timezone_location : timezoneLocationVal,
-                      no_of_visits : result.no_of_visits,
-                      web_path: result.web_path
-                    }
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
+                      //#region visitorPathList
 
-                      callback(response);
+                      var visitorPathList = [];
+                      visitorpathModel.find({ $and: [{ visitor_id: visitId }] }, function(err, data) {
+                        if (err) 
+                        {
+                          visitorPathList = {}; 
+                        } 
+                        else if (data == null || data == undefined || data == "") 
+                        {
+                          visitorPathList = {};
+                        } 
+                        else 
+                        {
+                          //console.log('muzii', data.completePath);
+                          // visitorPathList = data;
+
+                          response = { visitor_id: visitId , visitor_name : visit_name , agent_name : agent_name,
+                            country: countryVal,
+                            browser: browserVal,
+                            os: osVal,
+                            platform: platformVal,
+                            ipaddress : ipAddressVal,
+                            totalhournumber : totalHoursVal,
+                            totaltimeshort : totalTimeShortVal,
+                            totaltimelong : totalTimeExpVal,
+                            createdate : createdDateVal,
+                            createdOn : result.createdOn,
+                            payment_link : result.payment_link,
+                            brand_name : result.brand_name,
+                            brand_id : result.brand_id,
+                            phone_number : result.phone_number,
+                            visitor_email : result.visitor_email,
+                            visitor_uniqueNum : result.visitor_uniqueNum,
+                            timezone_location : timezoneLocationVal,
+                            no_of_visits : result.no_of_visits,
+                            web_path: result.web_path,
+                            unReadMsgCount : unReadMsgCountVal,
+                            visitorPathList: data
+                          }
+                          callback(response);
+                        }
+                      });
+                      //console.log('visitorPathList 2',visitorPathList, res.name1);
+                      
+                      //#endregion
+
                     });
                     
 
@@ -493,74 +488,126 @@ module.exports.sockets = function(http) {
                   else
                   {
                     //console.log('4 else', res.name2);
-                    // console.log('result -- 11', res);
+                    //console.log('result -- 11', res);
                     //console.log('--44444--');
                     
                     visit_name =  visit_name;
-                  agentModel.findOne(
-                    { $and: [{ agent_id : res.name2}] },
-                    function(err, resp){
-<<<<<<< HEAD
+                  // agentModel.findOne(
+                  //   { $and: [{ agent_id : res.name2}] },
+                  //   function(err, resp){
+                  //     // console.log('respp!!! ------', res.name2);
+                  //     // console.log('respp 222!!! ------', resp);
+                  //     chatModel.countDocuments({ $and: [{ msgFrom: res.name1, isRead: false }] }, function (err, count) {
+                  //       //console.log('there are %d jungle adventures', count);
+                  //       unReadMsgCountVal = count;
+                  //       //console.log('where clyde is hardcode',resp.agent_name); 
+                  //       //#region visitorPathList
+                  //       var visitorPathList = [];
+                  //       visitorpathModel.find({ $and: [{ visitor_id: res.name1 }] }, function(err, data) {
+                  //         if (err) 
+                  //         {
+                  //           visitorPathList = {}; 
+                  //         } 
+                  //         else if (data == null || data == undefined || data == "") 
+                  //         {
+                  //           visitorPathList = {};
+                  //         } 
+                  //         else 
+                  //         {
+                  //           //console.log('muzii', data.completePath);
+                  //           // visitorPathList = data;
+                  //           response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,//agent_name : 'Clyde',
+                  //             country: countryVal,
+                  //             browser: browserVal,
+                  //             os: osVal,
+                  //             platform: platformVal,
+                  //             ipaddress : ipAddressVal,
+                  //             totalhournumber : totalHoursVal,
+                  //             totaltimeshort : totalTimeShortVal,
+                  //             totaltimelong : totalTimeExpVal,
+                  //             createdate : createdDateVal,
+                  //             createdOn : result.createdOn,
+                  //             payment_link : result.payment_link,
+                  //             brand_name : result.brand_name,
+                  //             brand_id : result.brand_id,
+                  //             phone_number : result.phone_number,
+                  //             visitor_email : result.visitor_email,
+                  //             visitor_uniqueNum : result.visitor_uniqueNum,
+                  //             timezone_location : timezoneLocationVal,
+                  //             no_of_visits : result.no_of_visits,
+                  //             web_path: result.web_path,
+                  //             unReadMsgCount : unReadMsgCountVal,
+                  //             visitorPathList: data
+                  //           }
+                  //           callback(response);
+                  //         }
+                  //       });
+                  //       //console.log('visitorPathList 2',visitorPathList, res.name1);
+                  //       //#endregion
+                  //     });
+                  //   }
+                  // )
 
-                      //console.log('respp!!!', res.name2, ' !!! ', resp, '##', res);
-                      chatModel.countDocuments({ $and: [{ msgFrom: res.name1, isRead: false }] }, function (err, count) {
-                        //console.log('there are %d jungle adventures', count);
-                        unReadMsgCountVal = count;
-                        //console.log('where clyde is hardcode',resp.agent_name);
-                        response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,//agent_name : 'Clyde',
-                          country: countryVal,
-                          browser: browserVal,
-                          os: osVal,
-                          platform: platformVal,
-                          ipaddress : ipAddressVal,
-                          totalhournumber : totalHoursVal,
-                          totaltimeshort : totalTimeShortVal,
-                          totaltimelong : totalTimeExpVal,
-                          createdate : createdDateVal,
-                          createdOn : result.createdOn,
-                          payment_link : result.payment_link,
-                          brand_name : result.brand_name,
-                          brand_id : result.brand_id,
-                          phone_number : result.phone_number,
-                          visitor_email : result.visitor_email,
-                          visitor_uniqueNum : result.visitor_uniqueNum,
-                          timezone_location : timezoneLocationVal,
-                          no_of_visits : result.no_of_visits,
-                          web_path: result.web_path,
-                          unReadMsgCount : unReadMsgCountVal
-                        }
 
-                        callback(response);
-                      });
-                      
-=======
-                      //console.log('where clyde is hardcode',resp.agent_name);
-                      response = { visitor_id: res.name1 , visitor_name : visit_name , agent_name : resp.agent_name,//agent_name : 'Clyde',
-                      country: countryVal,
-                      browser: browserVal,
-                      os: osVal,
-                      platform: platformVal,
-                      ipaddress : ipAddressVal,
-                      totalhournumber : totalHoursVal,
-                      totaltimeshort : totalTimeShortVal,
-                      totaltimelong : totalTimeExpVal,
-                      createdate : createdDateVal,
-                      createdOn : result.createdOn,
-                      payment_link : result.payment_link,
-                      brand_name : result.brand_name,
-                      brand_id : result.brand_id,
-                      phone_number : result.phone_number,
-                      visitor_email : result.visitor_email,
-                      visitor_uniqueNum : result.visitor_uniqueNum,
-                      timezone_location : timezoneLocationVal,
-                      no_of_visits : result.no_of_visits,
-                      web_path: result.web_path
-                    }
+                  
+                  chatModel.countDocuments({ $and: [{ msgFrom: res.name1, isRead: false }] }, function (err, count) {
+                    unReadMsgCountVal = count;
+                    
+                    //#region visitorPathList
+                    
+                    var visitorPathList = [];
+                    visitorpathModel.find({ $and: [{ visitor_id: res.name1 }] }, function(err, data) {
+                      if (err) 
+                      {
+                        visitorPathList = {}; 
+                      } 
+                      else if (data == null || data == undefined || data == "") 
+                      {
+                        visitorPathList = {};
+                      } 
+                      else 
+                      {
+                        agentModel.findOne(
+                          { $and: [{ agent_id : res.name2 }] },
+                             function(err, resp){
+                              response = { 
+                                visitor_id: res.name1, 
+                                visitor_name: visit_name, 
+                                agent_name : resp.agent_name,//agent_name : 'Clyde',
+                                agent_id : resp.agent_id,
+                                agent_teamId : resp.agent_teamId,
+                                country: countryVal,
+                                browser: browserVal,
+                                os: osVal,
+                                platform: platformVal,
+                                ipaddress : ipAddressVal,
+                                totalhournumber : totalHoursVal,
+                                totaltimeshort : totalTimeShortVal,
+                                totaltimelong : totalTimeExpVal,
+                                createdate : createdDateVal,
+                                createdOn : result.createdOn,
+                                payment_link : result.payment_link,
+                                brand_name : result.brand_name,
+                                brand_id : result.brand_id,
+                                phone_number : result.phone_number,
+                                visitor_email : result.visitor_email,
+                                visitor_uniqueNum : result.visitor_uniqueNum,
+                                timezone_location : timezoneLocationVal,
+                                no_of_visits : result.no_of_visits,
+                                web_path: result.web_path,
+                                unReadMsgCount : unReadMsgCountVal,
+                                visitorPathList: data
+                              }
+                              callback(response);
+                             });
+                        
+                      }
+                    });
 
-                      callback(response);
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
-                    }
-                  )
+                    //#endregion
+                  });
+
+                       
 
                   }
                 }
@@ -574,6 +621,64 @@ module.exports.sockets = function(http) {
            }
          );
   });
+
+//#region get visitor id
+  // var teamBrands = {};
+  // socket.on("get_visitor_id", function(obj, callback) 
+  // {
+  //   var visitId = obj.visitorId;
+  //   var agentId = obj.agentId;
+  //   var agentTeamId = obj.agent_teamId;
+  //   var unReadMsgCountVal = 0;
+  //   // console.log('visitId --1',visitId);
+  //   // console.log('agentId --1',agentId);
+    
+  //   // brandModel.find({ $and: [{ brand_teamId: agentTeamId }] }, 
+  //   //   function(errBrand, brands) {
+  //   //     teamBrands = brands
+  //   //   }
+    
+  //   // );
+  //   // //console.log('teamBrands', teamBrands);
+  //   brandModel.find({ $and: [{ brand_teamId: agentTeamId }] },
+  //     function(errBrands, resultBrands) 
+  //     {
+
+  //      if(errBrands)
+  //      {
+  //        response = {}
+  //        callback(response);
+  //      }
+
+  //     if(resultBrands !== null || resultBrands.length !== 0 || resultBrands !== undefined)
+  //     //if(resultBrands.length !== 0)
+  //     {
+        
+  //       // var i;
+  //       // for (i = 0; i < resultBrands.length; i++) 
+  //       // {
+  //       //   //console.log(resultBrands[i].brand_id);
+  //       //   //text += resultBrands[i] + "<br>";
+  //       // }
+  //       if(resultBrands.length !== 0)
+  //       {
+  //         //teamBrands = resultBrands;
+  //         console.log('ZZZZ',resultBrands)
+  //         // var i;
+  //         // for (i = 0; i < resultBrands.length; i++) 
+  //         // {
+  //         //   //console.log(resultBrands[i].brand_id);
+  //         //   //text += resultBrands[i] + "<br>";
+            
+  //         // }
+  //       }
+  //       //console.log('ZZZZ',resultBrands)
+        
+        
+  //      }
+  //     }
+  //   );
+  // });
 
 
   socket.on("get_agent_id", function(agentId, callback) {
@@ -736,12 +841,11 @@ module.exports.sockets = function(http) {
     }); //end of set-room event.
 
     socket.on("update-room", function(room) {
-      console.log('muzaffar room back',room);
-      console.log('muzaffar room agentId',room.agent_id);
-      console.log('muzaffar room visitorId',room.visitor_id.id);
-
-      console.log('muzaffar room isVisitorList',room.isVisitorList);
-      console.log('muzaffar room page',room.page);
+      // console.log('muzaffar room back',room);
+      // console.log('muzaffar room agentId',room.agent_id);
+      // console.log('muzaffar room visitorId',room.visitor_id.id);
+      // console.log('muzaffar room isVisitorList',room.isVisitorList);
+      // console.log('muzaffar room page',room.page);
       const filter = { name1: room.visitor_id.id };
       const update = { name2: room.agent_id };
 
@@ -756,17 +860,17 @@ module.exports.sockets = function(http) {
         }
         if(obj != null)
         {
-          console.log('ji bhai');
+          //console.log('ji bhai');
           if(obj.name2 == "")
           {
-            console.log('ji bhai 2');
+            //console.log('ji bhai 2');
             roomModel.findOneAndUpdate(
               filter , update , function(err, result) {
               socket.room = result._id;
               chatModel.updateMany({ room : socket.room } , {$set: { msgTo: room.agent_id }} , function(err, result) { }  )
               if(room.isVisitorList == false)
               {
-                console.log('<---- msgs is read update ----> ji bhai 2');
+                //console.log('<---- msgs is read update ----> ji bhai 2');
                 chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
               }
               socket.room = result._id;
@@ -776,14 +880,14 @@ module.exports.sockets = function(http) {
           }
           else if(obj.name2 == "tFAE3OWtP")
           {
-            console.log('ji bhai 2.11');
+            //console.log('ji bhai 2.11');
             roomModel.findOneAndUpdate(
               filter , update , function(err, result) {
               socket.room = result._id;
               chatModel.updateMany({ room : socket.room } , {$set: { msgTo: room.agent_id }} , function(err, result) { }  )
               if(room.isVisitorList == false)
               {
-                console.log('<---- msgs is read update ----> ji bhai 2.11');
+                //console.log('<---- msgs is read update ----> ji bhai 2.11');
                 chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
               }
               socket.room = result._id;
@@ -797,15 +901,11 @@ module.exports.sockets = function(http) {
               socket.room =  obj._id;
               socket.join(socket.room);
               //console.log('rehan bhai', userSocket[socket.username]);
-<<<<<<< HEAD
               if(room.isVisitorList == false)
               {
-                console.log('<---- msgs is read update ----> ji bhai 3');
+                //console.log('<---- msgs is read update ----> ji bhai 3');
                 chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
               }
-=======
-              chatModel.update({room : socket.room, "isRead": false}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
               ioChat.to(userSocket[socket.username]).emit("update-room", socket.room);
               //ioChat.emit("update-room", socket.room);
               // ioChat.emit("test-sumair", socket.room);
@@ -902,7 +1002,6 @@ module.exports.sockets = function(http) {
           visitId: visitorId
       };
       socket.to(socket.room).emit('typingResponse-saboor', data);
-<<<<<<< HEAD
     });
 
     socket.on("typingClear", function(visitorId) {
@@ -917,22 +1016,6 @@ module.exports.sockets = function(http) {
       socket.to(socket.room).emit('payment-form-assignroom', socket.room);
     });
 
-=======
-    });
-
-    socket.on("typingClear", function(visitorId) {
-      socket.to(socket.room).emit('typingClearResponse', visitorId);
-    });
-
-
-    socket.on("show-payment-form-btn", function(data) {
-      //console.log(data);
-      //console.log('check socket.room', socket.room);
-      socket.to(socket.room).emit('show-payment-form-btn-ui', data);
-      socket.to(socket.room).emit('payment-form-assignroom', socket.room);
-    });
-
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
     socket.on('visitor-payment-response',function(data){
       // console.log('check console visitor payment resp', data);
       // console.log('check socket.room', data.room);
@@ -965,24 +1048,25 @@ module.exports.sockets = function(http) {
     //   },3500);
     // }); //end of typing event.
 
-    socket.on("msg-is-read", function(data) {
-      console.log('nasir bhai', data);
-      //isReadVisitorId = data.visitor_id;
-      isReadMsgId = data.msgId;
-      // chatModel.update({"msgFrom": data.visitor_id}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
-      //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
-    });
+    // socket.on("msg-is-read", function(data) {
+    //   console.log('nasir bhai', data);
+    //   //isReadVisitorId = data.visitor_id;
+    //   isReadMsgId = data.msgId;
+    //   // chatModel.update({"msgFrom": data.visitor_id}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+    //   //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
+    // });
 
-<<<<<<< HEAD
-    socket.on("active-visitor", function(data) {
-      console.log('kamran bhai', data);
-      isReadVisitorId = data.visitor_id;
-      // currentClickedVisitorArray.push(isReadVisitorId);
-      // console.log('current vis array', currentClickedVisitorArray);
-      //isReadMsgId = data.msgId;
-      // chatModel.update({"msgFrom": data.visitor_id}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
-      //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
-    });
+    // socket.on("active-visitor", function(data) {
+    //   console.log('kamran bhai', data);
+    //   isReadVisitorId = data.visitor_id;
+    //   // currentClickedVisitorArray.push(isReadVisitorId);
+    //   // console.log('current vis array', currentClickedVisitorArray);
+    //   //isReadMsgId = data.msgId;
+    //   // chatModel.update({"msgFrom": data.visitor_id}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+    //   //chatModel.updateMany({msgFrom: data.visitor_id, msgId: data.msgId }, { $set :{isRead: true}}, {multi: true}, (err, writeResult) => {});
+    // });
+
+    //#region when user is active on agent
 
     socket.on('get-current-visitor-response', function(currentVis, data, roomId){
       //console.log('check hogaya visitor'+ currentVis);
@@ -990,19 +1074,13 @@ module.exports.sockets = function(http) {
       //var dataSave = JSON.stringify(data);
       //console.log('--------- socket io visitor -------', socket.room);
       //console.log('--------- visitor room id -------', roomId);
-      console.log('saboor');
-=======
-    //for showing chats.
-    socket.on("chat-msg", function(data) {
-      // console.log('sokcet - room : ',socket.room);
-      //console.log('chat-msg saboor: ',data);
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
+      //console.log('saboor');
       const id = shortid.generate();
         //emits event to save chat to database.
         //console.log('dataSave.msgFrom',data.msgFrom);
         if(currentVis == data.msgFrom)
         {
-          //console.log('is read true');
+          console.log('is read true');
 
           eventEmitter.emit("save-chat", {
             msgFrom: data.msgFrom,
@@ -1019,7 +1097,7 @@ module.exports.sockets = function(http) {
           });
         }
         else{
-          //console.log('is read false');
+          console.log('is read false');
 
           eventEmitter.emit("save-chat", {
             msgFrom: data.msgFrom,
@@ -1175,14 +1253,17 @@ module.exports.sockets = function(http) {
 
     // });
 
+    //#endregion
+
+
     //for showing chats.
     socket.on("chat-msg", function(data) {
       // console.log('sokcet - room : ',socket.room);
-      console.log('chat-msg saboor: ',data);
+      //console.log('chat-msg saboor: ',data);
       if(data.type == "visitor")
       {
         // ioChat.emit('get-current-visitor-req', data);
-        //console.log(data, socket.room);
+        //console.log('@@1!!', socket.room);
         roomModel.findOne({ _id: socket.room }, function(err,obj) { 
           if(obj.name2 == '')
           {
@@ -1227,7 +1308,7 @@ module.exports.sockets = function(http) {
               )
             }else{
               //console.log(' socket.room 2',socket.room);
-              //console.log(' socket.room 3',data.date);
+              console.log(' socket.room 3',data.date);
               ioChat.to(socket.room).emit("chat-msg", {
                 msgFrom: data.msgFrom,
                 file: data.file,
@@ -1246,11 +1327,9 @@ module.exports.sockets = function(http) {
             //console.log('~~~~~~~~~ msg nae araha ~~~~~~~~', obj);
             if(agentStack[obj.name2] == "Online")
             {
-              ioChat.emit('get-current-visitor-req', data, socket.room);
-            }
-            else
-            {
-              console.log('~~~~~~~~~ agent is offline ~~~~~~~~~', data);
+              console.log('if -> get-current-visitor-req');
+              //ioChat.emit('get-current-visitor-req', data, socket.room);
+
               const id = shortid.generate();
 
               eventEmitter.emit("save-chat", {
@@ -1289,15 +1368,83 @@ module.exports.sockets = function(http) {
               }
               else
               {
-                ioChat.to(socket.room).emit("chat-msg", {
-                  msgFrom: data.msgFrom,
-                  file: data.file,
-                  msg: data.msg,
-                  id: id,
-                  date: data.date,
-                  repMsg : "",
-                  isRead : false
+                chatModel.findOne({ msgFrom: data.msgFrom, msg: data.msg, createdOn: data.date } , function(err,resCheckMsg){
+                  console.log(resCheckMsg);
+                  if(resCheckMsg == null)
+                  {
+                    ioChat.to(socket.room).emit("chat-msg", {
+                      msgFrom: data.msgFrom,
+                      file: data.file,
+                      msg: data.msg,
+                      id: id,
+                      date: data.date,
+                      repMsg : "",
+                      isRead : false
+                    });
+                  }
                 });
+                
+              }
+
+            }
+            else
+            {
+              //console.log('~~~~~~~~~ agent is offline ~~~~~~~~~', data);
+              const id = shortid.generate();
+
+              eventEmitter.emit("save-chat", {
+                msgFrom: data.msgFrom,
+                msgTo: obj.name2,
+                msg: data.msg,
+                file : data.file,
+                room: socket.room,
+                type: data.type,
+                id: id,
+                repMsgId: data.repMsgId,
+                date: data.date,
+                isRead: false
+              });
+              
+              //emits event to send chat msg to all clients.
+              if(data.repMsgId != ""){
+                chatModel.findOne(
+                  { $and: [{ msgId : data.repMsgId}] },
+                  function(err, res){
+                    ioChat.to(socket.room).emit("chat-msg", {
+                      msgFrom: data.msgFrom,
+                      file: data.file,
+                      msg: data.msg,
+                      id: id,
+                      date: data.date,
+                      repFrom : res.msgFrom,
+                      repTo : res.msgTo,
+                      repMsg : res.msg,
+                      repfile: res.file,
+                      repDate: res.createdOn,
+                      isRead : false
+                    });
+                  }
+                )
+              }
+              else
+              {
+                console.log('check double msg');
+                chatModel.findOne({ msgFrom: data.msgFrom, msg: data.msg, createdOn: data.date } , function(err,resCheckMsg){
+                  console.log(resCheckMsg);
+                  if(resCheckMsg == null)
+                  {
+                    ioChat.to(socket.room).emit("chat-msg", {
+                      msgFrom: data.msgFrom,
+                      file: data.file,
+                      msg: data.msg,
+                      id: id,
+                      date: data.date,
+                      repMsg : "",
+                      isRead : false
+                    });
+                  }
+                });
+                
               }
 
               //console.log('mil gaya ++++++++++++++++++++++++++++++',agentStack);
@@ -1309,7 +1456,7 @@ module.exports.sockets = function(http) {
       }
       else if(data.type == "agent")
       {
-        //console.log('--------- socket io agent -------', socket.room);
+        console.log('--------- socket io agent -------', socket.room);
 
         const id = shortid.generate();
         //emits event to save chat to database.
@@ -1361,6 +1508,8 @@ module.exports.sockets = function(http) {
              isRead : false
            });
          }
+
+         ioChat.to(socket.room).emit("open-visitor-chatwidget");
       }
       
     });
@@ -1435,8 +1584,8 @@ module.exports.sockets = function(http) {
     });
 
     socket.on("agent-logout", function(data) {
-      console.log(data);
-      console.log('agentStack',agentStack);
+      // console.log(data);
+      // console.log('agentStack',agentStack);
       console.log("agent chat disconnected.");
 
       if(socket.username != undefined)
@@ -1445,7 +1594,7 @@ module.exports.sockets = function(http) {
         agentStack[data] = "Offline";
 
       }
-      console.log('agentStack offline',agentStack);
+      //console.log('agentStack offline',agentStack);
       
     });
 
@@ -1464,7 +1613,7 @@ module.exports.sockets = function(http) {
         description: socket.username + " Logged out"
       });
       isReadVisitorId = 0;
-      console.log('agentStack',agentStack);
+      //console.log('agentStack',agentStack);
       console.log("chat disconnected.");
 
       _.unset(userSocket, socket.username);
@@ -1473,7 +1622,6 @@ module.exports.sockets = function(http) {
 
       // console.log('userSocket ---',userSocket);
       // console.log('visitorSocket ---',visitorSocket);
-<<<<<<< HEAD
 
       // console.log('userStack ****',userStack);
       // console.log('visitorStack ****',visitorStack);
@@ -1489,22 +1637,6 @@ module.exports.sockets = function(http) {
         //console.log('socket.username ^^^^^^',socket.username);
 
         
-=======
-
-      // console.log('userStack ****',userStack);
-      // console.log('visitorStack ****',visitorStack);
-
-      //console.log('socket.username ~~~~~',socket.username);
-
-      if(socket.username != undefined){
-
-        //console.log('socket.username ^^^^^^',socket.username);
-
-        _.unset(visitorSocket, socket.username);
-        visitorStack[socket.username] = "Offline";
-
-        ioChat.emit("onlineStack", visitorStack);
->>>>>>> 4e5a2b0bd32e296fd065dbb859fcb66ba205ce8f
       }
       
       //socket.emit('set-user-data', socket.username);
@@ -1518,18 +1650,19 @@ module.exports.sockets = function(http) {
   eventEmitter.on("save-chat", function(data) {
     // var today = Date.now();
     //console.log('save-chat',data);
-    if(data.type=="agent"){
+    if(data.type=="agent")
+    {
       console.log('agent');
-     var newChat = new chatModel({
-       msgFrom: data.msgFrom,
-       msgTo: data.msgTo,
-       msg: data.msg,
-       file: data.file,
-       repMsgId : data.repMsgId,
-       room: data.room,
-       msgId:data.id,
-       createdOn: data.date
-     });
+      var newChat = new chatModel({
+        msgFrom: data.msgFrom,
+        msgTo: data.msgTo,
+        msg: data.msg,
+        file: data.file,
+        repMsgId : data.repMsgId,
+        room: data.room,
+        msgId:data.id,
+        createdOn: data.date
+      });
     
      newChat.save(function(err, result) {
       if (err) {
@@ -1549,7 +1682,8 @@ module.exports.sockets = function(http) {
         //console.log('checking payement resp msg ', obj);
         agent_id = obj.name2;
 
-        if(agent_id == ""){
+        if(agent_id == "")
+        {
 
           var newChat = new chatModel({
             msgFrom: data.msgFrom,
@@ -1579,71 +1713,82 @@ module.exports.sockets = function(http) {
 
           
 
-          agentModel.findOne({ agent_id: agent_id } , function(err,res){
-            console.log('isReadVisitorId -->',isReadVisitorId);
-            // if(isReadVisitorId == data.msgFrom)
-            // {
-            //   var newChat = new chatModel({
-            //     msgFrom: data.msgFrom,
-            //     msgTo: res.agent_id,
-            //     msgId:data.id,
-            //     msg: data.msg,
-            //     repMsgId : data.repMsgId,
-            //     file: data.file,
-            //     room: data.room,
-            //     createdOn: data.date,
-            //     isRead: data.isRead
-            //   });
-            // }
-            // else
-            // {
-            //   var newChat = new chatModel({
-            //     msgFrom: data.msgFrom,
-            //     msgTo: res.agent_id,
-            //     msgId:data.id,
-            //     msg: data.msg,
-            //     repMsgId : data.repMsgId,
-            //     file: data.file,
-            //     room: data.room,
-            //     createdOn: data.date,
-            //     isRead: data.isRead
-            //   });
-            // }
+          // agentModel.findOne({ agent_id: agent_id } , function(err,res)
+          // {
+          //   //console.log('isReadVisitorId -->',isReadVisitorId);
+          //   // if(isReadVisitorId == data.msgFrom)
+          //   // {
+          //   //   var newChat = new chatModel({
+          //   //     msgFrom: data.msgFrom,
+          //   //     msgTo: res.agent_id,
+          //   //     msgId:data.id,
+          //   //     msg: data.msg,
+          //   //     repMsgId : data.repMsgId,
+          //   //     file: data.file,
+          //   //     room: data.room,
+          //   //     createdOn: data.date,
+          //   //     isRead: data.isRead
+          //   //   });
+          //   // }
+          //   // else
+          //   // {
+          //   //   var newChat = new chatModel({
+          //   //     msgFrom: data.msgFrom,
+          //   //     msgTo: res.agent_id,
+          //   //     msgId:data.id,
+          //   //     msg: data.msg,
+          //   //     repMsgId : data.repMsgId,
+          //   //     file: data.file,
+          //   //     room: data.room,
+          //   //     createdOn: data.date,
+          //   //     isRead: data.isRead
+          //   //   });
+          //   // }
             
-            var newChat = new chatModel({
-              msgFrom: data.msgFrom,
-              msgTo: res.agent_id,
-              msgId:data.id,
-              msg: data.msg,
-              repMsgId : data.repMsgId,
-              file: data.file,
-              room: data.room,
-              createdOn: data.date,
-              isRead: data.isRead
+            
+
+          // });
+
+          console.log(data.msgTo, agent_id);
+          
+          var newChat = new chatModel({
+            msgFrom: data.msgFrom,
+            msgTo: data.msgTo,
+            msgId:data.id,
+            msg: data.msg,
+            repMsgId : data.repMsgId,
+            file: data.file,
+            room: data.room,
+            createdOn: data.date,
+            isRead: data.isRead
+          });
+          chatModel.findOne({ msgFrom: data.msgFrom, msg: data.msg, createdOn: data.date } , function(err,resCheckMsg)
+          {
+            if(resCheckMsg == null)
+            {
+              newChat.save(function(err, result) {
+                if (err) {
+                  console.log("Error : " + err);
+                } else if (result == undefined || result == null || result == "") {
+                  console.log("Chat Is Not Saved.");
+                } else {
+                  // chatModel.findOne({ msgId: isReadMsgId }, function(err,obj) {
+                  //   console.log('obj result ', obj);
+                  // });
+                  //console.log('is read vis id', isReadVisitorId);
+                  // if(isReadVisitorId != 0)
+                  // {
+                  //     console.log('isReadMsgId', isReadMsgId);
+                  //     chatModel.update({"msgId": isReadMsgId}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
+                  // }
+                  console.log("Chat Saved 3.");
+                }
+             
+    
             });
-            newChat.save(function(err, result) {
-              if (err) {
-                console.log("Error : " + err);
-              } else if (result == undefined || result == null || result == "") {
-                console.log("Chat Is Not Saved.");
-              } else {
-                // chatModel.findOne({ msgId: isReadMsgId }, function(err,obj) {
-                //   console.log('obj result ', obj);
-                // });
-                console.log('is read vis id', isReadVisitorId);
-                // if(isReadVisitorId != 0)
-                // {
-                //     console.log('isReadMsgId', isReadMsgId);
-                //     chatModel.update({"msgId": isReadMsgId}, {"$set":{"isRead": true}}, {"multi": true}, (err, writeResult) => {});
-                // }
-                console.log("Chat Saved 3.");
-              }
-           
-  
+            }
           });
-
-          });
-
+          
         }
 
       });
@@ -1681,6 +1826,7 @@ module.exports.sockets = function(http) {
     //listening for get-all-users event. creating list of all users.
     eventEmitter.on("get-all-visitors", function() {
       visitorModel
+        // .find({ $and: [{ brand_teamId: 'GzBcwRjSIV' }] })
         .find({})
         .select("visitor_name")
         .select("visitor_id")
@@ -1717,63 +1863,175 @@ module.exports.sockets = function(http) {
 
 
   //listening get-room-data event.
+  // eventEmitter.on("get-room-data", function(room) {
+  //   roomModel.find(
+  //     {
+  //       $or: [
+  //         {
+  //           name1: room.name1
+  //         },
+  //         {
+  //           name1: room.name2
+  //         }//,
+  //         // {
+  //         //   name2: room.name1
+  //         // },
+  //         // {
+  //         //   name2: room.name2
+  //         // }
+  //       ]
+  //     },
+  //     function(err, result) {
+  //       if (err) {
+  //         console.log("Error : " + err);
+  //       } else {
+  //         if (result == "" || result == undefined || result == null) {
+  //           var today = Date.now();
+
+  //           visitorModel.findOne(
+  //             { $and: [{ visitor_id: room.name1 }] },
+  //             function(err, resultVisitor) {
+  //               if (err) {
+  //                 res.status(500).json({
+  //                   success: false,
+  //                   message: "Some Error Occured"
+  //                 });
+          
+  //               } else if (resultVisitor == null || resultVisitor == undefined || resultVisitor == "") {
+
+  //                 newRoom = new roomModel({
+  //                   name1: room.name1,
+  //                   name2: room.name2,
+  //                   lastActive: today,
+  //                   createdOn: today
+  //                 });
+  //                 newRoom.save(function(err, newResult) {
+  //                   if (err) {
+  //                     console.log("Error : " + err);
+  //                   } else if (
+  //                     newResult == "" ||
+  //                     newResult == undefined ||
+  //                     newResult == null
+  //                   ) {
+  //                     console.log("Some Error Occured During Room Creation.");
+  //                   } else {
+  //                     setRoom(newResult._id); //calling setRoom function.
+  //                   }
+  //                 }); //end of saving room.
+
+  //               }
+  //               else
+  //               {
+  //                 newRoom = new roomModel({
+  //                   name1: room.name1,
+  //                   name2: room.name2,
+  //                   brand_id: resultVisitor.brand_id,
+  //                   brand_teamId: resultVisitor.brand_teamId,
+  //                   lastActive: today,
+  //                   createdOn: today
+  //                 });
+  //                 newRoom.save(function(err, newResult) {
+  //                   if (err) {
+  //                     console.log("Error : " + err);
+  //                   } else if (
+  //                     newResult == "" ||
+  //                     newResult == undefined ||
+  //                     newResult == null
+  //                   ) {
+  //                     console.log("Some Error Occured During Room Creation.");
+  //                   } else {
+  //                     setRoom(newResult._id); //calling setRoom function.
+  //                   }
+  //                 }); //end of saving room.
+
+  //               }
+  //             });
+            
+  //         } else {
+  //           var jresult = JSON.parse(JSON.stringify(result));
+  //           setRoom(jresult[0]._id); //calling setRoom function.
+  //         }
+  //       } //end of else.
+  //     }
+  //   ); //end of find room.
+  // }); //end of get-room-data listener.
+
+
   eventEmitter.on("get-room-data", function(room) {
-    roomModel.find(
-      {
-        $or: [
-          {
-            name1: room.name1
-          },
-          {
-            name1: room.name2
-          }//,
-          // {
-          //   name2: room.name1
-          // },
-          // {
-          //   name2: room.name2
-          // }
-        ]
-      },
-      function(err, result) {
+    //console.log('uzair room -->', room);
+    visitorModel.findOne(
+      { $and: [{ visitor_id: room.name1, brand_id: room.brand_id, brand_teamId: room.brand_teamId  }] },
+      function(err, resultVisitor) {
         if (err) {
-          console.log("Error : " + err);
-        } else {
-          if (result == "" || result == undefined || result == null) {
-            var today = Date.now();
-
-            newRoom = new roomModel({
-              name1: room.name1,
-              name2: room.name2,
-              lastActive: today,
-              createdOn: today
-            });
-
-            newRoom.save(function(err, newResult) {
-              if (err) {
-                console.log("Error : " + err);
-              } else if (
-                newResult == "" ||
-                newResult == undefined ||
-                newResult == null
-              ) {
-                console.log("Some Error Occured During Room Creation.");
-              } else {
-                setRoom(newResult._id); //calling setRoom function.
+          // res.status(500).json({
+          //   success: false,
+          //   message: "Some Error Occured"
+          // });
+        }
+        else if (resultVisitor == null || resultVisitor == undefined || resultVisitor == "") {
+          // res.status(404).json({
+          //   success: false,
+          //   message: "Visitor Not Found"
+          // });
+        }
+        else
+        {
+          //console.log('vis brand id', resultVisitor.brand_id);
+          roomModel.findOne({ name1: room.name1, brand_id: resultVisitor.brand_id, brand_teamId: resultVisitor.brand_teamId },
+            function(errRoom, resultRoom) {
+              //console.log('just check -->', resultRoom);
+              var today = Date.now();
+              if (errRoom) {
+                // res.status(500).json({
+                //   success: false,
+                //   message: "Some Error Occured"
+                // });
               }
-            }); //end of saving room.
-          } else {
-            var jresult = JSON.parse(JSON.stringify(result));
-            setRoom(jresult[0]._id); //calling setRoom function.
-          }
-        } //end of else.
-      }
-    ); //end of find room.
-  }); //end of get-room-data listener.
+              else if (resultRoom == "" || resultRoom == undefined || resultRoom == null)
+              {
+                //console.log('agaya new room', resultRoom);
+                newRoom = new roomModel({
+                  name1: room.name1,
+                  name2: room.name2,
+                  brand_id: resultVisitor.brand_id,
+                  brand_teamId: resultVisitor.brand_teamId,
+                  lastActive: today,
+                  createdOn: today
+                });
+                newRoom.save(function(err, newResult) {
+                  if (err) {
+                    console.log("Error : " + err);
+                  } else if (
+                    newResult == "" ||
+                    newResult == undefined ||
+                    newResult == null
+                  ) {
+                    console.log("Some Error Occured During Room Creation.");
+                  } else {
+                    setRoom(newResult._id); //calling setRoom function.
+                  }
+                }); //end of saving room.
+              }
+              else
+              {
+                //console.log('agaya old room', resultRoom);
+                var jresult = JSON.parse(JSON.stringify(resultRoom));
+                //console.log('agaya old room ==> jresult', jresult._id);
+                // setRoom(jresult[0]._id);
+                setRoom(jresult._id);
+              }
+            });
+        }
+        
+      });
+  });
+
   //end of database operations for chat feature.
 
   //
   //
+
+
 
   //#region signup 
 

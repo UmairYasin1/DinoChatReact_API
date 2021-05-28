@@ -73,8 +73,9 @@ app.use(cookieParser());
 //const dbPath = "mongodb://localhost/socketChatDB";
 //const dbPath = "mongodb://localhost:27017/DinoChatTest";
 // const dbPath = "mongodb://umairyasin:03333088323@dinochatcluster-shard-00-00-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-01-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-02-dtwkz.mongodb.net:27017/DinoChatTest?replicaSet=DinoChatCluster-shard-0&ssl=true&authSource=admin";
-//const dbPath = "mongodb://localhost:27017/DinoChat";
-const dbPath = "mongodb://umairyasin:03333088323@dinochatcluster-shard-00-00-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-01-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-02-dtwkz.mongodb.net:27017/DinoChatTest2?replicaSet=DinoChatCluster-shard-0&ssl=true&authSource=admin";
+// const dbPath = "mongodb://localhost:27017/DinoChat";
+const dbPath = "mongodb://localhost:27017/DinoChat2";
+//const dbPath = "mongodb://umairyasin:03333088323@dinochatcluster-shard-00-00-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-01-dtwkz.mongodb.net:27017,dinochatcluster-shard-00-02-dtwkz.mongodb.net:27017/DinoChatTest2?replicaSet=DinoChatCluster-shard-0&ssl=true&authSource=admin";
 //const dbPath = `mongodb://github_demo:Pass\#12@ds149511.mlab.com:49511/socketionodejschat`;
 mongoose.connect(dbPath, { useNewUrlParser: true });
 mongoose.connection.once("open", function() {
